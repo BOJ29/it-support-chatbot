@@ -1,0 +1,427 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ticket Dashboard - IT Support</title>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        
+        body {
+            font-family: 'Montserrat', sans-serif;
+            background: #f5f7fa;
+            padding: 15px;
+            min-height: 100vh;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        
+        /* ============ HEADER ============ */
+        .header {
+            background: #014711;
+            color: white;
+            padding: 18px 22px;
+            border-radius: 12px;
+            margin-bottom: 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 15px;
+            box-shadow: 0 4px 15px rgba(1,71,17,0.2);
+        }
+        
+        .header h1 {
+            font-size: 1.4em;
+            font-weight: 700;
+        }
+        
+        .header p {
+            opacity: 0.85;
+            font-size: 0.8em;
+            margin-top: 3px;
+        }
+        
+        .header-stats {
+            display: flex;
+            gap: 12px;
+            flex-wrap: wrap;
+            align-items: center;
+        }
+        
+        .stat-box {
+            background: rgba(255,255,255,0.15);
+            padding: 10px 18px;
+            border-radius: 10px;
+            text-align: center;
+            min-width: 70px;
+        }
+        
+        .stat-number {
+            font-size: 1.5em;
+            font-weight: 700;
+            line-height: 1.2;
+        }
+        
+        .stat-label {
+            font-size: 0.7em;
+            opacity: 0.9;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        
+        .refresh-btn {
+            background: #8dc73f;
+            color: #014711;
+            border: none;
+            padding: 10px 18px;
+            border-radius: 8px;
+            font-weight: 700;
+            font-family: 'Montserrat', sans-serif;
+            cursor: pointer;
+            font-size: 0.85em;
+            transition: all 0.3s;
+            white-space: nowrap;
+        }
+        
+        .refresh-btn:hover {
+            background: white;
+            color: #014711;
+        }
+        
+        .refresh-btn:active {
+            transform: scale(0.95);
+        }
+        
+        /* ============ TICKET CARDS ============ */
+        .ticket-card {
+            background: white;
+            border-radius: 10px;
+            padding: 16px 20px;
+            margin-bottom: 12px;
+            border-left: 5px solid #8dc73f;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+            transition: all 0.3s;
+        }
+        
+        .ticket-card:hover {
+            box-shadow: 0 5px 20px rgba(0,0,0,0.1);
+            transform: translateX(3px);
+        }
+        
+        .ticket-card.priority-high {
+            border-left-color: #e74c3c;
+        }
+        
+        .ticket-card.priority-critical {
+            border-left-color: #c0392b;
+            background: #fff5f5;
+        }
+        
+        .ticket-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+            flex-wrap: wrap;
+            gap: 8px;
+        }
+        
+        .ticket-id {
+            font-size: 1.1em;
+            font-weight: 700;
+            color: #014711;
+        }
+        
+        .badge-group {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+        
+        .priority-badge {
+            padding: 4px 12px;
+            border-radius: 15px;
+            font-size: 0.75em;
+            font-weight: 700;
+            white-space: nowrap;
+        }
+        
+        .priority-medium {
+            background: #fff3cd;
+            color: #856404;
+        }
+        
+        .priority-high {
+            background: #ffe5e5;
+            color: #cc0000;
+        }
+        
+        .priority-critical {
+            background: #ff0000;
+            color: white;
+        }
+        
+        .status-open {
+            background: #e8f5e9;
+            color: #2e7d32;
+            padding: 4px 12px;
+            border-radius: 15px;
+            font-size: 0.75em;
+            font-weight: 600;
+            white-space: nowrap;
+        }
+        
+        .status-resolved {
+            background: #e0e0e0;
+            color: #555;
+            padding: 4px 12px;
+            border-radius: 15px;
+            font-size: 0.75em;
+            font-weight: 600;
+            white-space: nowrap;
+        }
+        
+        .ticket-issue {
+            color: #555;
+            line-height: 1.6;
+            margin: 8px 0;
+            font-size: 0.9em;
+        }
+        
+        .ticket-footer {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 12px;
+            color: #888;
+            font-size: 0.78em;
+            flex-wrap: wrap;
+            gap: 8px;
+        }
+        
+        .no-tickets {
+            text-align: center;
+            padding: 50px 20px;
+            color: #888;
+            font-size: 1.1em;
+        }
+        
+        .resolve-btn {
+            background: #8dc73f;
+            color: #014711;
+            border: none;
+            padding: 7px 16px;
+            border-radius: 18px;
+            cursor: pointer;
+            font-weight: 600;
+            font-family: 'Montserrat', sans-serif;
+            font-size: 0.82em;
+            transition: all 0.3s;
+            white-space: nowrap;
+        }
+        
+        .resolve-btn:hover {
+            background: #014711;
+            color: white;
+        }
+        
+        .resolve-btn:active {
+            transform: scale(0.95);
+        }
+        
+        /* ============ MOBILE RESPONSIVE ============ */
+        @media (max-width: 768px) {
+            body {
+                padding: 8px;
+            }
+            
+            .header {
+                padding: 14px 16px;
+                border-radius: 10px;
+                flex-direction: column;
+                align-items: flex-start;
+            }
+            
+            .header h1 {
+                font-size: 1.2em;
+            }
+            
+            .header-stats {
+                width: 100%;
+                justify-content: space-between;
+            }
+            
+            .stat-box {
+                padding: 8px 14px;
+                min-width: 60px;
+            }
+            
+            .stat-number {
+                font-size: 1.3em;
+            }
+            
+            .ticket-card {
+                padding: 14px 16px;
+                border-radius: 8px;
+            }
+            
+            .ticket-id {
+                font-size: 1em;
+            }
+            
+            .ticket-issue {
+                font-size: 0.85em;
+            }
+            
+            .ticket-footer {
+                font-size: 0.72em;
+            }
+        }
+        
+        @media (max-width: 480px) {
+            .header-stats {
+                gap: 8px;
+            }
+            
+            .stat-box {
+                padding: 6px 10px;
+                min-width: 50px;
+            }
+            
+            .stat-number {
+                font-size: 1.1em;
+            }
+            
+            .stat-label {
+                font-size: 0.6em;
+            }
+            
+            .refresh-btn {
+                padding: 8px 14px;
+                font-size: 0.78em;
+            }
+            
+            .ticket-card {
+                padding: 12px 14px;
+                border-left-width: 4px;
+            }
+            
+            .ticket-header {
+                gap: 6px;
+            }
+            
+            .priority-badge,
+            .status-open,
+            .status-resolved {
+                font-size: 0.7em;
+                padding: 3px 10px;
+            }
+            
+            .resolve-btn {
+                padding: 6px 14px;
+                font-size: 0.75em;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <div>
+                <h1>🎫 Support Tickets</h1>
+                <p>Real-time ticket management</p>
+            </div>
+            <div class="header-stats">
+                <div class="stat-box">
+                    <div class="stat-number" id="openCount">0</div>
+                    <div class="stat-label">Open</div>
+                </div>
+                <div class="stat-box">
+                    <div class="stat-number" id="totalCount">0</div>
+                    <div class="stat-label">Total</div>
+                </div>
+                <button class="refresh-btn" onclick="loadTickets()">🔄 Refresh</button>
+                <img src="/static/Agmas LinkedIn Carousel.png" alt="Company Logo" 
+                 style="width:45px; height:45px; border-radius:8px; object-fit:contain; background:white; padding:3px; margin-left:8px;"
+                 onerror="this.style.display='none';">
+                </div>
+            </div>
+        </div>
+        
+        <div id="ticketsList">
+            <div class="no-tickets">Loading tickets...</div>
+        </div>
+    </div>
+
+    <script>
+        async function loadTickets() {
+            try {
+                const response = await fetch('/api/tickets');
+                const tickets = await response.json();
+                
+                const openTickets = tickets.filter(t => t.status === 'Open');
+                document.getElementById('openCount').textContent = openTickets.length;
+                document.getElementById('totalCount').textContent = tickets.length;
+                
+                if (tickets.length === 0) {
+                    document.getElementById('ticketsList').innerHTML = 
+                        '<div class="no-tickets">✅ All clear! No pending tickets.</div>';
+                    return;
+                }
+                
+                document.getElementById('ticketsList').innerHTML = tickets.map(ticket => `
+                    <div class="ticket-card priority-${ticket.priority.toLowerCase()}">
+                        <div class="ticket-header">
+                            <span class="ticket-id">#${ticket.id}</span>
+                            <div class="badge-group">
+                                <span class="priority-badge priority-${ticket.priority.toLowerCase()}">
+                                    ${ticket.priority}
+                                </span>
+                                <span class="${ticket.status === 'Open' ? 'status-open' : 'status-resolved'}">
+                                    ${ticket.status}
+                                </span>
+                            </div>
+                        </div>
+                        <div class="ticket-issue">
+                            <strong>Issue:</strong> ${ticket.issue_description}
+                        </div>
+                        <div class="ticket-footer">
+                            <span>👤 ${ticket.user_id}</span>
+                            <span>📅 ${new Date(ticket.created_date).toLocaleString()}</span>
+                            ${ticket.status === 'Open' ? 
+                                `<button class="resolve-btn" onclick="resolveTicket(${ticket.id})">✅ Resolve</button>` 
+                                : ''}
+                        </div>
+                    </div>
+                `).join('');
+                
+            } catch (error) {
+                document.getElementById('ticketsList').innerHTML = 
+                    '<div class="no-tickets">❌ Error loading tickets</div>';
+                console.error('Error:', error);
+            }
+        }
+        
+        async function resolveTicket(ticketId) {
+            if (confirm('Mark ticket #' + ticketId + ' as resolved?')) {
+                try {
+                    const response = await fetch('/api/resolve/' + ticketId, { method: 'POST' });
+                    if (response.ok) {
+                        loadTickets();
+                    }
+                } catch (error) {
+                    alert('Error resolving ticket');
+                }
+            }
+        }
+        
+        loadTickets();
+        setInterval(loadTickets, 30000);
+    </script>
+</body>
+</html>
