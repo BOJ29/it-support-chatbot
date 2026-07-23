@@ -177,8 +177,8 @@
         }
         
         .status-resolved {
-            background: #e0e0e0;
-            color: #555;
+            background: #1a5632;
+            color: #ffffff;
             padding: 4px 12px;
             border-radius: 15px;
             font-size: 0.75em;
@@ -223,7 +223,19 @@
             font-size: 0.82em;
             transition: all 0.3s;
             white-space: nowrap;
+        } 
+        
+        .resolved-badge {
+              background: #1a5632;
+              color: #ffffff;
+              padding: 7px 16px;
+              border-radius: 18px;
+              font-size: 0.82em;
+              font-weight: 700;
+              white-space: nowrap;
+              display: inline-block;
         }
+        
         
         .resolve-btn:hover {
             background: #014711;
@@ -394,8 +406,8 @@
                             <span>👤 ${ticket.user_id}</span>
                             <span>📅 ${new Date(ticket.created_date).toLocaleString()}</span>
                             ${ticket.status === 'Open' ? 
-                                `<button class="resolve-btn" onclick="resolveTicket(${ticket.id})">✅ Resolve</button>` 
-                                : ''}
+                            `<button class="resolve-btn" onclick="resolveTicket(${ticket.id})">✅ Resolve</button>` 
+                            : `<span class="resolved-badge">✅ Resolved</span>`}
                         </div>
                     </div>
                 `).join('');
