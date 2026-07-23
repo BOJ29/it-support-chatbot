@@ -55,25 +55,29 @@ def get_tickets():
 @app.route('/api/resolve/<int:ticket_id>', methods=['POST'])
 def resolve_ticket(ticket_id):
     """Mark a ticket as resolved"""
-    conn = sqlite3.connect('data/it_support.db')
-    cursor = conn.cursor()
-    cursor.execute('''
-        UPDATE tickets 
-        SET status = 'Resolved', resolved_date = CURRENT_TIMESTAMP 
-        WHERE id = ?
-    ''', (ticket_id,))
-    conn.commit()
-    conn.close()
-    return jsonify({'success': True})
+    try:
+        conn = sqlite3.connect('data/it_support.db')
+        cursor = conn.cursor()
+        cursor.execute('''
+            UPDATE tickets 
+            SET status = 'Resolved', resolved_date = CURRENT_TIMESTAMP 
+            WHERE id = ?
+        ''', (ticket_id,))
+        conn.commit()
+        conn.close()
+        return jsonify({'success': True, 'message': f'Ticket #{ticket_id} resolved'})
+    except Exception as e:
+        print(f"Error resolving ticket: {e}")
+        return jsonify({'success': False, 'error': str(e)}), 500
 
 # ============================================
 # START THE SERVER
 # ============================================
 
 if __name__ == '__main__':
+    import os
+    port = int(os.environ.get('PORT', 5000))
     print("🚀 Starting IT Support Chatbot...")
-    print("=" * 50)
-    print("👤 User Chat:     http://localhost:5000")
-    print("📊 Admin Tickets: http://localhost:5000/admin/tickets")
-    print("=" * 50)
-    app.run(debug=True, host='0.0.0.0', port=5000)
+    print(f"👤 User Chat:     http://0.0.0.0:{port}")
+    print(f"📊 Admin Tickets: http://0.0.0.0:{port}/admin/tickets")
+    app.run(debug=False, host='0.0.0.0', port=port)
