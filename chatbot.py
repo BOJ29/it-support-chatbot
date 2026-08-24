@@ -191,7 +191,12 @@ class ITSupportChatbot:
             # Try sending email if available
             if HAS_EMAIL:
                 try:
-                    self.email.send_ticket_notification(ticket_id, user_id, last_issue, priority)
+                    import threading
+                    email_thread = threading.Thread(
+                        target=self.email.send_ticket_notification,
+                        args=(ticket_id, user_id, last_issue, priority),
+                        daemon=True 
+                    )
                 except Exception as e:
                     print(f"Email notification failed: {e}")
             

@@ -2,33 +2,32 @@ import smtplib
 from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
 from datetime import datetime
+import os
 
 class EmailNotifier:
     def __init__(self):
-        # ============================================
-        # ZOHO MAIL CONFIGURATION
-        # ============================================
+        # ZOHO MAIL SETTINGS
         self.smtp_server = "smtp.zoho.com"
         self.smtp_port = 587
-        self.sender_email = "internalcontrol@omascrnl.com"   # CHANGE THIS
-        self.sender_password = "Omas@2025"          # CHANGE THIS
+        self.sender_email = os.environ.get('ZOHO_EMAIL', 'it@agmasiltd.com')
+        self.sender_password = os.environ.get('ZOHO_PASSWORD', 'your-app-password')
         
         # IT Team who receives tickets
         self.it_team_emails = [
-            "support@agmasiltd.com",   
+            os.environ.get('IT_EMAIL_1', 'support@agmasiltd.com'),
+            # Add more as needed
         ]
     
     def send_ticket_notification(self, ticket_id, user_id, issue, priority):
         """Send email to IT team when new ticket is created"""
         
-        # Choose emoji based on priority
+        # Priority emoji
         priority_emoji = {
             'Critical': '🔴',
             'High': '🟠',
             'Medium': '🟡',
             'Low': '🟢'
         }
-        
         emoji = priority_emoji.get(priority, '🔵')
         
         subject = f"{emoji} Ticket #{ticket_id} - {priority} Priority - IT Support"
@@ -51,8 +50,8 @@ class EmailNotifier:
         ─────────────────────────────────────
         🔗 QUICK ACTIONS:
         ─────────────────────────────────────
-        • View all tickets: http://localhost:5000/admin/tickets
-        • Resolve this ticket: http://localhost:5000/admin/tickets
+        • View all tickets: https://it-support-chatbot-xo65.onrender.com/admin/tickets
+        • Resolve this ticket: https://it-support-chatbot-xo65.onrender.com/admin/tickets
 
         ─────────────────────────────────────
         This is an automated notification from IT Support Chatbot
