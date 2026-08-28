@@ -10,7 +10,7 @@ class EmailNotifier:
         self.smtp_server = "smtp.zoho.com"
         self.smtp_port = 587
         self.sender_email = os.environ.get('ZOHO_EMAIL', 'it@agmasiltd.com')
-        self.sender_password = os.environ.get('ZOHO_PASSWORD', 'your-app-password')
+        self.sender_password = os.environ.get('ZOHO_PASSWORD', 'internal@2005')
         
         # IT Team who receives tickets
         self.it_team_emails = [

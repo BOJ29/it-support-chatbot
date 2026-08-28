@@ -12,12 +12,11 @@ class AIEngine:
         self.solutions_data = solutions
         
         for idx, sol in enumerate(solutions):
-            # Extract all words from problem and symptoms
             text = f"{sol['problem']} {sol['symptoms']}"
             words = set(re.findall(r'\b\w+\b', text.lower()))
             
             for word in words:
-                if len(word) > 2:  # Ignore very short words
+                if len(word) > 2:
                     if word not in self.keyword_index:
                         self.keyword_index[word] = []
                     self.keyword_index[word].append(idx)
@@ -30,10 +29,7 @@ class AIEngine:
         if not self.solutions_data:
             return []
         
-        # Extract keywords from user query
         query_words = set(re.findall(r'\b\w+\b', user_query.lower()))
-        
-        # Score each solution based on keyword matches
         scores = np.zeros(len(self.solutions_data))
         
         for word in query_words:
@@ -41,7 +37,6 @@ class AIEngine:
                 for idx in self.keyword_index[word]:
                     scores[idx] += 1
         
-        # Get top matches
         top_indices = np.argsort(scores)[-top_k:][::-1]
         
         results = []
