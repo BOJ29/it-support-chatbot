@@ -9,6 +9,30 @@ app = Flask(__name__)
 CORS(app)
 chatbot = ITSupportChatbot()
 
+# Create database if it doesn't exist
+def init_db():
+    db_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'data', 'it_support.db')
+    if not os.path.exists(os.path.dirname(db_path)):
+        os.makedirs(os.path.dirname(db_path))
+    
+    conn = sqlite3.connect(db_path)
+    cursor = conn.cursor()
+    cursor.execute('''
+        CREATE TABLE IF NOT EXISTS tickets (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            user_id TEXT,
+            issue_description TEXT NOT NULL,
+            priority TEXT DEFAULT 'Medium',
+            status TEXT DEFAULT 'Open',
+            created_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+            resolved_date TIMESTAMP
+        )
+    ''')
+    conn.commit()
+    conn.close()
+
+init_db()
+
 # Ensure data directory exists
 if not os.path.exists('data'):
     os.makedirs('data')
