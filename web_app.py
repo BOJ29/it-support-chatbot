@@ -78,20 +78,24 @@ def resolve_ticket(ticket_id):
 def test_email():
     """Test email sending"""
     try:
-        if hasattr(chatbot, 'email'):
-            result = chatbot.email.send_email(
-                "agmasiltd@gmail.com",
-                "Test from IT Chatbot",
-                "This is a test email!"
-            )
-            if result:
-                return "✅ Email sent! Check agmasiltd@gmail.com"
-            else:
-                return "❌ Email failed. Check Render logs."
+        from sendgrid_notifier import SendGridNotifier
+        sg = SendGridNotifier()
+        
+        if not sg.api_key:
+            return "❌ API Key is empty! Add SENDGRID_API_KEY to Render Environment."
+        
+        result = sg.send_email(
+            "agmasiltd@gmail.com",
+            "Test from IT Chatbot",
+            "This is a test email!"
+        )
+        
+        if result:
+            return "✅ Email sent! Check agmasiltd@gmail.com"
         else:
-            return "❌ Email not configured. SendGrid import failed."
+            return "❌ Email failed. Check Render logs."
     except Exception as e:
-        return f"❌ Error: {e}"
+        return f"❌ Error: {str(e)}"
     
 if __name__ == '__main__':
     import os
