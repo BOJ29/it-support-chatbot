@@ -74,6 +74,22 @@ def resolve_ticket(ticket_id):
 # START THE SERVER
 # ============================================
 
+@app.route('/test-email')
+def test_email():
+    """Test email sending"""
+    try:
+        result = chatbot.email.send_email(
+            "agmasiltd@gmail.com",
+            "Test from IT Chatbot",
+            "This is a test email!"
+        )
+        if result:
+            return "✅ Email sent! Check agmasiltd@gmail.com"
+        else:
+            return "❌ Email failed. Check Render logs."
+    except Exception as e:
+        return f"❌ Error: {e}"
+    
 if __name__ == '__main__':
     import os
     port = int(os.environ.get('PORT', 5000))
