@@ -3,10 +3,15 @@ from flask_cors import CORS
 from chatbot import ITSupportChatbot
 import sqlite3
 import uuid
+import os
 
 app = Flask(__name__)
 CORS(app)
 chatbot = ITSupportChatbot()
+
+# Ensure data directory exists
+if not os.path.exists('data'):
+    os.makedirs('data')
 
 # ============================================
 # USER CHAT ROUTES
@@ -44,19 +49,25 @@ def admin_dashboard():
 @app.route('/api/tickets')
 def get_tickets():
     """API to get all tickets"""
-    conn = sqlite3.connect('data/it_support.db')
-    conn.row_factory = sqlite3.Row
-    cursor = conn.cursor()
-    cursor.execute('SELECT * FROM tickets ORDER BY created_date DESC')
-    tickets = [dict(row) for row in cursor.fetchall()]
-    conn.close()
-    return jsonify(tickets)
+    try:
+        db_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'data', 'it_support.db')
+        conn = sqlite3.connect(db_path)
+        conn.row_factory = sqlite3.Row
+        cursor = conn.cursor()
+        cursor.execute('SELECT * FROM tickets ORDER BY created_date DESC')
+        tickets = [dict(row) for row in cursor.fetchall()]
+        conn.close()
+        return jsonify(tickets)
+    except Exception as e:
+        print(f"Error fetching tickets: {e}")
+        return jsonify([])
 
 @app.route('/api/resolve/<int:ticket_id>', methods=['POST'])
 def resolve_ticket(ticket_id):
     """Mark a ticket as resolved"""
     try:
-        conn = sqlite3.connect('data/it_support.db')
+        db_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'data', 'it_support.db')
+        conn = sqlite3.connect(db_path)
         cursor = conn.cursor()
         cursor.execute('''
             UPDATE tickets 
@@ -65,13 +76,13 @@ def resolve_ticket(ticket_id):
         ''', (ticket_id,))
         conn.commit()
         conn.close()
-        return jsonify({'success': True, 'message': f'Ticket #{ticket_id} resolved'})
+        return jsonify({'success': True})
     except Exception as e:
         print(f"Error resolving ticket: {e}")
         return jsonify({'success': False, 'error': str(e)}), 500
 
 # ============================================
-# START THE SERVER
+# EMAIL TEST
 # ============================================
 
 @app.route('/test-email')
@@ -96,9 +107,12 @@ def test_email():
             return "❌ Email failed. Check Render logs."
     except Exception as e:
         return f"❌ Error: {str(e)}"
-    
+
+# ============================================
+# START THE SERVER
+# ============================================
+
 if __name__ == '__main__':
-    import os
     port = int(os.environ.get('PORT', 5000))
     print("🚀 Starting IT Support Chatbot...")
     print(f"👤 User Chat:     http://0.0.0.0:{port}")
