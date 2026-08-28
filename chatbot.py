@@ -6,9 +6,11 @@ import os
 try:
     from sendgrid_notifier import SendGridNotifier
     HAS_EMAIL = True
-except:
+except Exception as e:
     HAS_EMAIL = False
-    print("SendGrid Email API not available")
+    import traceback
+    print(f"SendGrid Email API not available: {e}")
+    traceback.print_exc()
 
 class ITSupportChatbot:
     def __init__(self):
