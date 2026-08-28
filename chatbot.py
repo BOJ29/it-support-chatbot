@@ -196,7 +196,7 @@ class ITSupportChatbot:
                     email_thread = threading.Thread(
                         target=self.email.send_email,
                         args=(
-                            "support@agmasiltd.com",
+                            "agmasiltd@gmail.com",
                             f"🔧 Ticket #{ticket_id} - {priority} Priority",
                             f"Ticket ID: #{ticket_id}\nPriority: {priority}\n"
                             f"Issue: {last_issue}\nUser: {user_id}"
