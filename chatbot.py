@@ -1,22 +1,21 @@
 from knowledge_manager import KnowledgeManager
 from ai_engine import AIEngine
-from gmail_notifier import GmailNotifier
 import os
 
 # Try to import email notifier, but don't crash if it fails
 try:
-    from gmail_notifier import GmailNotifier
+    from sendgrid_notifier import SendGridNotifier
     HAS_EMAIL = True
 except:
     HAS_EMAIL = False
-    print("Gmail Email API not available")
+    print("SendGrid Email API not available")
 
 class ITSupportChatbot:
     def __init__(self):
         self.knowledge = KnowledgeManager()
         self.ai = AIEngine()
         if HAS_EMAIL:
-            self.email = GmailNotifier()
+            self.email = SendGridNotifier()
         self.user_sessions = {}
         
         all_solutions = self.knowledge.search_solutions("")
@@ -231,7 +230,6 @@ class ITSupportChatbot:
         
         except Exception as e:
             print(f"Ticket creation failed: {e}")
-            # Even if ticket fails, reset session
             self.user_sessions[user_id] = {
                 'attempts': 0,
                 'category': None,
