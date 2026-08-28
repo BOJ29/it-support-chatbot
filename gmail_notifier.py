@@ -7,8 +7,8 @@ class GmailNotifier:
     def __init__(self):
         self.smtp_server = "smtp.gmail.com"
         self.smtp_port = 587
-        self.sender_email = os.environ.get('GMAIL_EMAIL', 'your-email@gmail.com')
-        self.sender_password = os.environ.get('GMAIL_PASSWORD', 'your-app-password')
+        self.sender_email = "agmasiltd@gmail.com"
+        self.sender_password = "noazwstentfgnrlg"
         self.it_team_emails = ["agmasiltd@gmail.com"]
     
     def send_email(self, to_email, subject, body):
