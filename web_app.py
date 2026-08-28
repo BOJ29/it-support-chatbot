@@ -78,15 +78,18 @@ def resolve_ticket(ticket_id):
 def test_email():
     """Test email sending"""
     try:
-        result = chatbot.email.send_email(
-            "agmasiltd@gmail.com",
-            "Test from IT Chatbot",
-            "This is a test email!"
-        )
-        if result:
-            return "✅ Email sent! Check agmasiltd@gmail.com"
+        if hasattr(chatbot, 'email'):
+            result = chatbot.email.send_email(
+                "agmasiltd@gmail.com",
+                "Test from IT Chatbot",
+                "This is a test email!"
+            )
+            if result:
+                return "✅ Email sent! Check agmasiltd@gmail.com"
+            else:
+                return "❌ Email failed. Check Render logs."
         else:
-            return "❌ Email failed. Check Render logs."
+            return "❌ Email not configured. SendGrid import failed."
     except Exception as e:
         return f"❌ Error: {e}"
     
