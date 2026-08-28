@@ -1,21 +1,22 @@
 from knowledge_manager import KnowledgeManager
 from ai_engine import AIEngine
+from gmail_notifier import GmailNotifier
 import os
 
 # Try to import email notifier, but don't crash if it fails
 try:
-    from email_notifier import EmailNotifier
+    from gmail_notifier import GmailNotifier
     HAS_EMAIL = True
 except:
     HAS_EMAIL = False
-    print("Email notifier not available - tickets will still work")
+    print("Gmail Email API not available")
 
 class ITSupportChatbot:
     def __init__(self):
         self.knowledge = KnowledgeManager()
         self.ai = AIEngine()
         if HAS_EMAIL:
-            self.email = EmailNotifier()
+            self.email = GmailNotifier()
         self.user_sessions = {}
         
         all_solutions = self.knowledge.search_solutions("")
@@ -193,10 +194,16 @@ class ITSupportChatbot:
                 try:
                     import threading
                     email_thread = threading.Thread(
-                        target=self.email.send_ticket_notification,
-                        args=(ticket_id, user_id, last_issue, priority),
-                        daemon=True 
+                        target=self.email.send_email,
+                        args=(
+                            "support@agmasiltd.com",
+                            f"🔧 Ticket #{ticket_id} - {priority} Priority",
+                            f"Ticket ID: #{ticket_id}\nPriority: {priority}\n"
+                            f"Issue: {last_issue}\nUser: {user_id}"
+                        ),
+                        daemon=True
                     )
+                    email_thread.start()
                 except Exception as e:
                     print(f"Email notification failed: {e}")
             
