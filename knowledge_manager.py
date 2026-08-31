@@ -35,18 +35,36 @@ class KnowledgeManager:
         return results
     
     def create_ticket(self, user_id, issue, priority="Medium", staff_name="", staff_email=""):
-        conn = self.get_connection()
-        cursor = conn.cursor()
-        
-        cursor.execute('''
-            INSERT INTO tickets (user_id, staff_name, staff_email, issue_description, priority)
-            VALUES (?, ?, ?, ?, ?)
-        ''', (user_id, staff_name, staff_email, issue, priority))
-        
-        ticket_id = cursor.lastrowid
-        conn.commit()
-        conn.close()
-        return ticket_id
+        try:
+            conn = self.get_connection()
+            cursor = conn.cursor()
+            
+            cursor.execute('''
+                INSERT INTO tickets (user_id, staff_name, staff_email, issue_description, priority)
+                VALUES (?, ?, ?, ?, ?)
+            ''', (user_id, staff_name, staff_email, issue, priority))
+            
+            ticket_id = cursor.lastrowid
+            conn.commit()
+            conn.close()
+            return ticket_id
+        except Exception as e:
+            print(f"Error creating ticket with staff info: {e}")
+            # Fallback: try without staff info
+            try:
+                conn = self.get_connection()
+                cursor = conn.cursor()
+                cursor.execute('''
+                    INSERT INTO tickets (user_id, issue_description, priority)
+                    VALUES (?, ?, ?)
+                ''', (user_id, issue, priority))
+                ticket_id = cursor.lastrowid
+                conn.commit()
+                conn.close()
+                return ticket_id
+            except Exception as e2:
+                print(f"Fallback also failed: {e2}")
+                return 0
     
     def get_all_categories(self):
         conn = self.get_connection()

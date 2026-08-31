@@ -17,6 +17,10 @@ def init_db():
     
     conn = sqlite3.connect(db_path)
     cursor = conn.cursor()
+    
+    # Drop old table to recreate with new columns
+    cursor.execute('DROP TABLE IF EXISTS tickets')
+    
     cursor.execute('''
         CREATE TABLE IF NOT EXISTS tickets (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -32,6 +36,7 @@ def init_db():
     ''')
     conn.commit()
     conn.close()
+    print("✅ Database initialized with staff columns")
 
 init_db()
 
@@ -51,21 +56,25 @@ def home():
 @app.route('/api/chat', methods=['POST'])
 def chat():
     """API endpoint for chat"""
-    data = request.json
-    user_id = data.get('user_id', data.get('staff_email', str(uuid.uuid4())))
-    staff_name = data.get('staff_name', '')
-    staff_email = data.get('staff_email', user_id)
-    message = data.get('message', '')
-    
-    if not message:
-        return jsonify({'error': 'No message provided'}), 400
-    
-    # Pass staff info to chatbot
-    response = chatbot.process_message(user_id, message, staff_name=staff_name, staff_email=staff_email)
-    response['user_id'] = user_id
-    response['staff_name'] = staff_name
-    
-    return jsonify(response)
+    try:
+        data = request.json
+        user_id = data.get('user_id', data.get('staff_email', str(uuid.uuid4())))
+        staff_name = data.get('staff_name', '')
+        staff_email = data.get('staff_email', user_id)
+        message = data.get('message', '')
+        
+        if not message:
+            return jsonify({'error': 'No message provided'}), 400
+        
+        # Pass staff info to chatbot
+        response = chatbot.process_message(user_id, message, staff_name=staff_name, staff_email=staff_email)
+        response['user_id'] = user_id
+        response['staff_name'] = staff_name
+        
+        return jsonify(response)
+    except Exception as e:
+        print(f"Chat error: {e}")
+        return jsonify({'message': f'❌ Error processing message: {str(e)}', 'type': 'error'}), 500
 
 # ============================================
 # IT SUPPORT TEAM - TICKET DASHBOARD
