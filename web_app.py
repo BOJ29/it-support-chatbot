@@ -21,6 +21,8 @@ def init_db():
         CREATE TABLE IF NOT EXISTS tickets (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
             user_id TEXT,
+            staff_name TEXT,
+            staff_email TEXT,
             issue_description TEXT NOT NULL,
             priority TEXT DEFAULT 'Medium',
             status TEXT DEFAULT 'Open',
@@ -50,14 +52,18 @@ def home():
 def chat():
     """API endpoint for chat"""
     data = request.json
-    user_id = data.get('user_id', str(uuid.uuid4()))
+    user_id = data.get('user_id', data.get('staff_email', str(uuid.uuid4())))
+    staff_name = data.get('staff_name', '')
+    staff_email = data.get('staff_email', user_id)
     message = data.get('message', '')
     
     if not message:
         return jsonify({'error': 'No message provided'}), 400
     
-    response = chatbot.process_message(user_id, message)
+    # Pass staff info to chatbot
+    response = chatbot.process_message(user_id, message, staff_name=staff_name, staff_email=staff_email)
     response['user_id'] = user_id
+    response['staff_name'] = staff_name
     
     return jsonify(response)
 

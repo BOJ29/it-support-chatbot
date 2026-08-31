@@ -3,7 +3,7 @@ import os
 
 class KnowledgeManager:
     def __init__(self):
-        self.db_path = 'data/it_support.db'
+        self.db_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'data', 'it_support.db')
     
     def get_connection(self):
         conn = sqlite3.connect(self.db_path)
@@ -34,14 +34,14 @@ class KnowledgeManager:
         conn.close()
         return results
     
-    def create_ticket(self, user_id, issue, priority="Medium"):
+    def create_ticket(self, user_id, issue, priority="Medium", staff_name="", staff_email=""):
         conn = self.get_connection()
         cursor = conn.cursor()
         
         cursor.execute('''
-            INSERT INTO tickets (user_id, issue_description, priority)
-            VALUES (?, ?, ?)
-        ''', (user_id, issue, priority))
+            INSERT INTO tickets (user_id, staff_name, staff_email, issue_description, priority)
+            VALUES (?, ?, ?, ?, ?)
+        ''', (user_id, staff_name, staff_email, issue, priority))
         
         ticket_id = cursor.lastrowid
         conn.commit()
