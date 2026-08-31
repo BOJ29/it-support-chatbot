@@ -117,6 +117,75 @@
             letter-spacing: -1px;
         }
 
+        /* ============ NAME CAPTURE MODAL ============ */
+        .name-modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.7);
+            z-index: 1000;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .name-modal-box {
+            background: white;
+            padding: 30px 25px;
+            border-radius: 15px;
+            max-width: 400px;
+            width: 90%;
+            text-align: center;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+        }
+
+        .name-modal-box h2 {
+            color: #014711;
+            margin-bottom: 10px;
+            font-size: 1.3em;
+        }
+
+        .name-modal-box p {
+            color: #555;
+            margin-bottom: 20px;
+            font-size: 0.9em;
+        }
+
+        .name-modal-box input {
+            width: 100%;
+            padding: 12px;
+            margin-bottom: 10px;
+            border: 2px solid #8dc73f;
+            border-radius: 8px;
+            font-size: 1em;
+            font-family: 'Montserrat', sans-serif;
+            outline: none;
+        }
+
+        .name-modal-box input:focus {
+            border-color: #014711;
+        }
+
+        .name-modal-box button {
+            background: #8dc73f;
+            color: #014711;
+            padding: 12px 30px;
+            border: none;
+            border-radius: 25px;
+            font-size: 1em;
+            font-weight: 700;
+            cursor: pointer;
+            font-family: 'Montserrat', sans-serif;
+            transition: all 0.3s;
+        }
+
+        .name-modal-box button:hover {
+            background: #014711;
+            color: white;
+        }
+
         /* ============ QUICK BUTTONS ============ */
         .quick-buttons {
             padding: 10px 16px;
@@ -401,10 +470,23 @@
     </style>
 </head>
 <body>
+
+    <!-- NAME CAPTURE MODAL -->
+    <div class="name-modal" id="nameModal">
+        <div class="name-modal-box">
+            <h2>👋 Welcome to IT Support</h2>
+            <p>Please enter your details to continue</p>
+            
+            <input type="text" id="staffName" placeholder="Your Full Name">
+            <input type="email" id="staffEmail" placeholder="Your Email Address">
+            
+            <button onclick="saveStaffInfo()">Start Chat 💬</button>
+        </div>
+    </div>
+
     <div class="chat-container">
         
         <!-- HEADER -->
-    
         <div class="chat-header">
             <div class="header-left">
                 <div class="header-icon">
@@ -439,10 +521,8 @@
                 • <strong>Software</strong> — installation, Office apps<br><br>
                 Describe your problem or tap a button above! ⬆️
             </div>
-        </div>  
+        </div>
 
-
-        
         <!-- INPUT AREA -->
         <div class="chat-input-area">
             <input 
@@ -456,8 +536,29 @@
     </div>
 
     <script>
+        let staffName = '';
+        let staffEmail = '';
         const userId = 'user_' + Math.random().toString(36).substr(2, 9);
         let isProcessing = false;
+
+        function saveStaffInfo() {
+            const name = document.getElementById('staffName').value.trim();
+            const email = document.getElementById('staffEmail').value.trim();
+            
+            if (!name || !email) {
+                alert('Please enter your name and email');
+                return;
+            }
+            
+            staffName = name;
+            staffEmail = email;
+            
+            // Hide the modal
+            document.getElementById('nameModal').style.display = 'none';
+            
+            // Welcome message with their name
+            addMessage(`👋 Welcome <strong>${staffName}</strong>! How can I help you today?`, 'bot');
+        }
 
         document.getElementById('messageInput').addEventListener('keypress', function(e) {
             if (e.key === 'Enter' && !isProcessing) {
@@ -486,7 +587,12 @@
                 const response = await fetch('/api/chat', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ user_id: userId, message: message })
+                    body: JSON.stringify({ 
+                        user_id: staffEmail || userId,
+                        staff_name: staffName,
+                        staff_email: staffEmail,
+                        message: message 
+                    })
                 });
                 
                 const data = await response.json();
