@@ -24,14 +24,22 @@ class ITSupportChatbot:
         if all_solutions:
             self.ai.prepare_solutions(all_solutions)
     
-    def process_message(self, user_id, message):
+    def process_message(self, user_id, message, staff_name='', staff_email=''):
         if user_id not in self.user_sessions:
             self.user_sessions[user_id] = {
                 'attempts': 0,
                 'category': None,
                 'last_issue': None,
-                'awaiting_feedback': False
+                'awaiting_feedback': False,
+                'staff_name': staff_name,
+                'staff_email': staff_email
             }
+        else:
+            # Update staff info if provided
+            if staff_name:
+                self.user_sessions[user_id]['staff_name'] = staff_name
+            if staff_email:
+                self.user_sessions[user_id]['staff_email'] = staff_email
         
         session = self.user_sessions[user_id]
         message_lower = message.lower().strip()
@@ -186,9 +194,13 @@ class ITSupportChatbot:
             priority = 'High'
         
         last_issue = session.get('last_issue', 'Issue escalated by user')
+        staff_name = session.get('staff_name', '')
+        staff_email = session.get('staff_email', user_id)
         
         try:
-            ticket_id = self.knowledge.create_ticket(user_id, last_issue, priority)
+            ticket_id = self.knowledge.create_ticket(
+                user_id, last_issue, priority, staff_name, staff_email
+            )
             
             # Try sending email if available
             if HAS_EMAIL:
@@ -200,7 +212,7 @@ class ITSupportChatbot:
                             "agmasiltd@gmail.com",
                             f"🔧 Ticket #{ticket_id} - {priority} Priority",
                             f"Ticket ID: #{ticket_id}\nPriority: {priority}\n"
-                            f"Issue: {last_issue}\nUser: {user_id}"
+                            f"Issue: {last_issue}\nStaff: {staff_name}\nEmail: {staff_email}"
                         ),
                         daemon=True
                     )
@@ -213,7 +225,9 @@ class ITSupportChatbot:
                 'attempts': 0,
                 'category': None,
                 'last_issue': None,
-                'awaiting_feedback': False
+                'awaiting_feedback': False,
+                'staff_name': staff_name,
+                'staff_email': staff_email
             }
             
             return {
@@ -236,7 +250,9 @@ class ITSupportChatbot:
                 'attempts': 0,
                 'category': None,
                 'last_issue': None,
-                'awaiting_feedback': False
+                'awaiting_feedback': False,
+                'staff_name': staff_name,
+                'staff_email': staff_email
             }
             return {
                 'message': (
