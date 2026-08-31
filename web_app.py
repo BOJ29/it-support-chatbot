@@ -95,7 +95,7 @@ def resolve_ticket(ticket_id):
         cursor = conn.cursor()
         cursor.execute('''
             UPDATE tickets 
-            SET status = 'Resolved', resolved_date = CURRENT_TIMESTAMP 
+            SET status = 'Resolved'
             WHERE id = ?
         ''', (ticket_id,))
         conn.commit()
