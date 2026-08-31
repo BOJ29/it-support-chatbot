@@ -584,16 +584,22 @@
             const typingId = showTyping();
             
             try {
+                const userIdentifier = staffEmail || userId;
+                
                 const response = await fetch('/api/chat', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ 
-                        user_id: staffEmail || userId,
-                        staff_name: staffName,
-                        staff_email: staffEmail,
+                        user_id: userIdentifier,
+                        staff_name: staffName || 'Unknown',
+                        staff_email: staffEmail || userIdentifier,
                         message: message 
                     })
                 });
+                
+                if (!response.ok) {
+                    throw new Error('Server error: ' + response.status);
+                }
                 
                 const data = await response.json();
                 removeTyping(typingId);
@@ -607,7 +613,8 @@
                 
             } catch (error) {
                 removeTyping(typingId);
-                addMessage('❌ Connection error. Please try again.', 'bot');
+                addMessage('❌ Connection error: ' + error.message, 'bot');
+                console.error('Error:', error);
             }
             
             isProcessing = false;
