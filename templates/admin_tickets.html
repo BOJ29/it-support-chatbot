@@ -48,7 +48,7 @@
         
         .header-stats {
             display: flex;
-            gap: 12px;
+            gap: 10px;
             flex-wrap: wrap;
             align-items: center;
         }
@@ -88,13 +88,68 @@
             white-space: nowrap;
         }
         
+        .export-btn {
+            background: #ffffff;
+            color: #014711;
+            border: none;
+            padding: 10px 18px;
+            border-radius: 8px;
+            font-weight: 700;
+            font-family: 'Montserrat', sans-serif;
+            cursor: pointer;
+            font-size: 0.85em;
+            transition: all 0.3s;
+            white-space: nowrap;
+        }
+        
+        .export-btn:hover {
+            background: #8dc73f;
+            transform: scale(1.03);
+        }
+        
         .refresh-btn:hover {
             background: white;
             color: #014711;
         }
         
-        .refresh-btn:active {
-            transform: scale(0.95);
+        /* ============ STATS PANEL ============ */
+        .stats-panel {
+            display: none;
+            background: #f8faf7;
+            border: 2px solid #8dc73f;
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 20px;
+        }
+        
+        .stats-panel.show {
+            display: block;
+        }
+        
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 15px;
+            margin-bottom: 15px;
+        }
+        
+        .stat-card {
+            text-align: center;
+            background: white;
+            padding: 15px;
+            border-radius: 10px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+        }
+        
+        .stat-card .number {
+            font-size: 2em;
+            font-weight: 700;
+            color: #014711;
+        }
+        
+        .stat-card .label {
+            font-size: 0.8em;
+            color: #888;
         }
         
         /* ============ TICKET CARDS ============ */
@@ -193,6 +248,15 @@
             font-size: 0.9em;
         }
         
+        .ticket-user {
+            background: #f0f4f0;
+            padding: 8px 12px;
+            border-radius: 8px;
+            margin: 8px 0;
+            font-size: 0.85em;
+            color: #333;
+        }
+        
         .ticket-footer {
             display: flex;
             justify-content: space-between;
@@ -223,121 +287,49 @@
             font-size: 0.82em;
             transition: all 0.3s;
             white-space: nowrap;
-        } 
-        
-        .resolved-badge {
-              background: #1a5632;
-              color: #ffffff;
-              padding: 7px 16px;
-              border-radius: 18px;
-              font-size: 0.82em;
-              font-weight: 700;
-              white-space: nowrap;
-              display: inline-block;
         }
         
+        .resolved-badge {
+            background: #1a5632;
+            color: #ffffff;
+            padding: 7px 16px;
+            border-radius: 18px;
+            font-size: 0.82em;
+            font-weight: 700;
+            white-space: nowrap;
+            display: inline-block;
+        }
         
         .resolve-btn:hover {
             background: #014711;
             color: white;
         }
         
-        .resolve-btn:active {
-            transform: scale(0.95);
-        }
-        
         /* ============ MOBILE RESPONSIVE ============ */
         @media (max-width: 768px) {
-            body {
-                padding: 8px;
-            }
-            
-            .header {
-                padding: 14px 16px;
-                border-radius: 10px;
-                flex-direction: column;
-                align-items: flex-start;
-            }
-            
-            .header h1 {
-                font-size: 1.2em;
-            }
-            
-            .header-stats {
-                width: 100%;
-                justify-content: space-between;
-            }
-            
-            .stat-box {
-                padding: 8px 14px;
-                min-width: 60px;
-            }
-            
-            .stat-number {
-                font-size: 1.3em;
-            }
-            
-            .ticket-card {
-                padding: 14px 16px;
-                border-radius: 8px;
-            }
-            
-            .ticket-id {
-                font-size: 1em;
-            }
-            
-            .ticket-issue {
-                font-size: 0.85em;
-            }
-            
-            .ticket-footer {
-                font-size: 0.72em;
-            }
+            body { padding: 8px; }
+            .header { padding: 14px 16px; flex-direction: column; align-items: flex-start; }
+            .header h1 { font-size: 1.2em; }
+            .header-stats { width: 100%; justify-content: space-between; flex-wrap: wrap; }
+            .stat-box { padding: 8px 14px; min-width: 60px; }
+            .stat-number { font-size: 1.3em; }
+            .ticket-card { padding: 14px 16px; }
+            .ticket-id { font-size: 1em; }
+            .ticket-issue { font-size: 0.85em; }
+            .ticket-footer { font-size: 0.72em; }
+            .stats-grid { grid-template-columns: 1fr; }
         }
         
         @media (max-width: 480px) {
-            .header-stats {
-                gap: 8px;
-            }
-            
-            .stat-box {
-                padding: 6px 10px;
-                min-width: 50px;
-            }
-            
-            .stat-number {
-                font-size: 1.1em;
-            }
-            
-            .stat-label {
-                font-size: 0.6em;
-            }
-            
-            .refresh-btn {
-                padding: 8px 14px;
-                font-size: 0.78em;
-            }
-            
-            .ticket-card {
-                padding: 12px 14px;
-                border-left-width: 4px;
-            }
-            
-            .ticket-header {
-                gap: 6px;
-            }
-            
-            .priority-badge,
-            .status-open,
-            .status-resolved {
-                font-size: 0.7em;
-                padding: 3px 10px;
-            }
-            
-            .resolve-btn {
-                padding: 6px 14px;
-                font-size: 0.75em;
-            }
+            .header-stats { gap: 8px; }
+            .stat-box { padding: 6px 10px; min-width: 50px; }
+            .stat-number { font-size: 1.1em; }
+            .stat-label { font-size: 0.6em; }
+            .refresh-btn, .export-btn { padding: 8px 14px; font-size: 0.78em; }
+            .ticket-card { padding: 12px 14px; }
+            .ticket-header { gap: 6px; }
+            .priority-badge, .status-open, .status-resolved { font-size: 0.7em; padding: 3px 10px; }
+            .resolve-btn { padding: 6px 14px; font-size: 0.75em; }
         }
     </style>
 </head>
@@ -358,11 +350,19 @@
                     <div class="stat-label">Total</div>
                 </div>
                 <button class="refresh-btn" onclick="loadTickets()">🔄 Refresh</button>
+                <button class="export-btn" onclick="exportCSV()">📥 Export CSV</button>
+                <button class="export-btn" onclick="toggleStats()">📊 Statistics</button>
                 <img src="/static/Agmas LinkedIn Carousel.png" alt="Company Logo" 
-                 style="width:45px; height:45px; border-radius:8px; object-fit:contain; background:white; padding:3px; margin-left:8px;"
-                 onerror="this.style.display='none';">
-                </div>
+                     style="width:45px; height:45px; border-radius:8px; object-fit:contain; background:white; padding:3px; margin-left:8px;"
+                     onerror="this.style.display='none';">
             </div>
+        </div>
+        
+        <!-- STATS PANEL -->
+        <div class="stats-panel" id="statsPanel">
+            <h3 style="color:#014711; margin-bottom:15px;">📊 Monthly Statistics</h3>
+            <div class="stats-grid" id="statsGrid"></div>
+            <div id="categoryBreakdown"></div>
         </div>
         
         <div id="ticketsList">
@@ -387,27 +387,30 @@
                 }
                 
                 document.getElementById('ticketsList').innerHTML = tickets.map(ticket => `
-                    <div class="ticket-card priority-${ticket.priority.toLowerCase()}">
+                    <div class="ticket-card priority-${ticket.priority ? ticket.priority.toLowerCase() : 'medium'}">
                         <div class="ticket-header">
                             <span class="ticket-id">#${ticket.id}</span>
                             <div class="badge-group">
-                                <span class="priority-badge priority-${ticket.priority.toLowerCase()}">
-                                    ${ticket.priority}
+                                <span class="priority-badge priority-${ticket.priority ? ticket.priority.toLowerCase() : 'medium'}">
+                                    ${ticket.priority || 'Medium'}
                                 </span>
                                 <span class="${ticket.status === 'Open' ? 'status-open' : 'status-resolved'}">
-                                    ${ticket.status}
+                                    ${ticket.status || 'Open'}
                                 </span>
                             </div>
                         </div>
                         <div class="ticket-issue">
-                            <strong>Issue:</strong> ${ticket.issue_description}
+                            <strong>Issue:</strong> ${ticket.issue_description || 'N/A'}
+                        </div>
+                        <div class="ticket-user">
+                            <strong>👤 Staff:</strong> ${ticket.staff_name || 'Unknown'} 
+                            <strong>📧 Email:</strong> ${ticket.staff_email || ticket.user_id || 'N/A'}
                         </div>
                         <div class="ticket-footer">
-                            <span>👤 ${ticket.user_id}</span>
                             <span>📅 ${new Date(ticket.created_date).toLocaleString()}</span>
                             ${ticket.status === 'Open' ? 
-                            `<button class="resolve-btn" onclick="resolveTicket(${ticket.id})">✅ Resolve</button>` 
-                            : `<span class="resolved-badge">✅ Resolved</span>`}
+                                `<button class="resolve-btn" onclick="resolveTicket(${ticket.id})">✅ Resolve</button>` 
+                                : `<span class="resolved-badge">✅ Resolved</span>`}
                         </div>
                     </div>
                 `).join('');
@@ -420,15 +423,71 @@
         }
         
         async function resolveTicket(ticketId) {
-            if (confirm('Mark ticket #' + ticketId + ' as resolved?')) {
-                try {
-                    const response = await fetch('/api/resolve/' + ticketId, { method: 'POST' });
-                    if (response.ok) {
-                        loadTickets();
-                    }
-                } catch (error) {
+            try {
+                const response = await fetch('/api/resolve/' + ticketId, { method: 'POST' });
+                if (response.ok) {
+                    loadTickets();
+                } else {
                     alert('Error resolving ticket');
                 }
+            } catch (error) {
+                alert('Error: ' + error.message);
+            }
+        }
+        
+        function exportCSV() {
+            window.open('/api/export-tickets', '_blank');
+        }
+        
+        async function toggleStats() {
+            const panel = document.getElementById('statsPanel');
+            
+            if (panel.classList.contains('show')) {
+                panel.classList.remove('show');
+                return;
+            }
+            
+            try {
+                const response = await fetch('/api/stats');
+                const data = await response.json();
+                
+                const ms = data.month_stats || {};
+                const categories = data.categories || [];
+                
+                document.getElementById('statsGrid').innerHTML = `
+                    <div class="stat-card">
+                        <div class="number">${ms.total_tickets || 0}</div>
+                        <div class="label">Total Tickets</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="number" style="color:#8dc73f;">${ms.open_tickets || 0}</div>
+                        <div class="label">Open</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="number" style="color:#1a5632;">${ms.resolved_tickets || 0}</div>
+                        <div class="label">Resolved</div>
+                    </div>
+                `;
+                
+                let categoryHTML = '<h4 style="margin-bottom:10px;">Category Breakdown:</h4>';
+                if (categories.length > 0) {
+                    categories.forEach(c => {
+                        categoryHTML += `
+                            <div style="display:flex; justify-content:space-between; padding:5px 0; border-bottom:1px solid #e0e0e0;">
+                                <span>${c.category}</span>
+                                <strong>${c.count}</strong>
+                            </div>
+                        `;
+                    });
+                } else {
+                    categoryHTML += '<p>No data this month</p>';
+                }
+                
+                document.getElementById('categoryBreakdown').innerHTML = categoryHTML;
+                panel.classList.add('show');
+                
+            } catch (error) {
+                alert('Error loading stats: ' + error.message);
             }
         }
         

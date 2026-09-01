@@ -1,9 +1,11 @@
-from flask import Flask, render_template, request, jsonify
+from flask import Flask, render_template, request, jsonify, Response
 from flask_cors import CORS
 from chatbot import ITSupportChatbot
 import sqlite3
 import uuid
 import os
+import csv
+import io
 
 app = Flask(__name__)
 CORS(app)
@@ -119,6 +121,112 @@ def resolve_ticket(ticket_id):
     except Exception as e:
         print(f"Error resolving ticket: {e}")
         return jsonify({'success': False, 'error': str(e)}), 500
+
+# ============================================
+# EXPORT ROUTES
+# ============================================
+
+@app.route('/api/export-tickets')
+def export_tickets():
+    """Export tickets as CSV for Excel"""
+    try:
+        db_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'data', 'it_support.db')
+        conn = sqlite3.connect(db_path)
+        conn.row_factory = sqlite3.Row
+        cursor = conn.cursor()
+        cursor.execute('SELECT * FROM tickets ORDER BY created_date DESC')
+        tickets = [dict(row) for row in cursor.fetchall()]
+        conn.close()
+        
+        # Create CSV in memory
+        output = io.StringIO()
+        writer = csv.writer(output)
+        
+        # Write header
+        writer.writerow(['Ticket ID', 'Staff Name', 'Staff Email', 'Issue', 'Priority', 'Status', 'Created Date', 'Resolved Date'])
+        
+        # Write data
+        for ticket in tickets:
+            writer.writerow([
+                ticket.get('id', ''),
+                ticket.get('staff_name', ''),
+                ticket.get('staff_email', ''),
+                ticket.get('issue_description', ''),
+                ticket.get('priority', ''),
+                ticket.get('status', ''),
+                ticket.get('created_date', ''),
+                ticket.get('resolved_date', '')
+            ])
+        
+        csv_data = output.getvalue()
+        
+        return Response(
+            csv_data,
+            mimetype='text/csv',
+            headers={'Content-Disposition': 'attachment; filename=it_tickets_report.csv'}
+        )
+    
+    except Exception as e:
+        print(f"Export error: {e}")
+        return jsonify({'error': str(e)}), 500
+
+
+@app.route('/api/stats')
+def get_stats():
+    """Get monthly statistics"""
+    try:
+        from datetime import datetime
+        
+        db_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'data', 'it_support.db')
+        conn = sqlite3.connect(db_path)
+        conn.row_factory = sqlite3.Row
+        cursor = conn.cursor()
+        
+        current_month = datetime.now().strftime('%Y-%m')
+        
+        # Get month stats
+        cursor.execute("""
+            SELECT 
+                COUNT(*) as total_tickets,
+                SUM(CASE WHEN status = 'Open' THEN 1 ELSE 0 END) as open_tickets,
+                SUM(CASE WHEN status = 'Resolved' THEN 1 ELSE 0 END) as resolved_tickets,
+                SUM(CASE WHEN priority = 'High' THEN 1 ELSE 0 END) as high_priority,
+                SUM(CASE WHEN priority = 'Medium' THEN 1 ELSE 0 END) as medium_priority,
+                SUM(CASE WHEN priority = 'Critical' THEN 1 ELSE 0 END) as critical_priority
+            FROM tickets 
+            WHERE created_date LIKE ?
+        """, (current_month + '%',))
+        
+        month_stats = dict(cursor.fetchone())
+        
+        # Get category breakdown
+        cursor.execute("""
+            SELECT 
+                CASE 
+                    WHEN issue_description LIKE '%printer%' OR issue_description LIKE '%print%' THEN 'Printer'
+                    WHEN issue_description LIKE '%network%' OR issue_description LIKE '%internet%' OR issue_description LIKE '%wifi%' THEN 'Network'
+                    WHEN issue_description LIKE '%freez%' OR issue_description LIKE '%slow%' OR issue_description LIKE '%crash%' THEN 'System'
+                    WHEN issue_description LIKE '%install%' OR issue_description LIKE '%software%' OR issue_description LIKE '%app%' THEN 'Software'
+                    ELSE 'Other'
+                END as category,
+                COUNT(*) as count
+            FROM tickets
+            WHERE created_date LIKE ?
+            GROUP BY category
+        """, (current_month + '%',))
+        
+        categories = [dict(row) for row in cursor.fetchall()]
+        conn.close()
+        
+        return jsonify({
+            'month': current_month,
+            'month_stats': month_stats,
+            'categories': categories
+        })
+    
+    except Exception as e:
+        print(f"Stats error: {e}")
+        return jsonify({'error': str(e)}), 500
 
 # ============================================
 # EMAIL TEST
