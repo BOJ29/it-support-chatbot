@@ -20,7 +20,6 @@
             margin: 0 auto;
         }
         
-        /* ============ HEADER ============ */
         .header {
             background: #014711;
             color: white;
@@ -35,16 +34,8 @@
             box-shadow: 0 4px 15px rgba(1,71,17,0.2);
         }
         
-        .header h1 {
-            font-size: 1.4em;
-            font-weight: 700;
-        }
-        
-        .header p {
-            opacity: 0.85;
-            font-size: 0.8em;
-            margin-top: 3px;
-        }
+        .header h1 { font-size: 1.4em; font-weight: 700; }
+        .header p { opacity: 0.85; font-size: 0.8em; margin-top: 3px; }
         
         .header-stats {
             display: flex;
@@ -61,18 +52,8 @@
             min-width: 70px;
         }
         
-        .stat-number {
-            font-size: 1.5em;
-            font-weight: 700;
-            line-height: 1.2;
-        }
-        
-        .stat-label {
-            font-size: 0.7em;
-            opacity: 0.9;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-        }
+        .stat-number { font-size: 1.5em; font-weight: 700; line-height: 1.2; }
+        .stat-label { font-size: 0.7em; opacity: 0.9; text-transform: uppercase; letter-spacing: 0.5px; }
         
         .refresh-btn {
             background: #8dc73f;
@@ -102,17 +83,9 @@
             white-space: nowrap;
         }
         
-        .export-btn:hover {
-            background: #8dc73f;
-            transform: scale(1.03);
-        }
+        .export-btn:hover { background: #8dc73f; transform: scale(1.03); }
+        .refresh-btn:hover { background: white; color: #014711; }
         
-        .refresh-btn:hover {
-            background: white;
-            color: #014711;
-        }
-        
-        /* ============ STATS PANEL ============ */
         .stats-panel {
             display: none;
             background: #f8faf7;
@@ -122,9 +95,7 @@
             margin-bottom: 20px;
         }
         
-        .stats-panel.show {
-            display: block;
-        }
+        .stats-panel.show { display: block; }
         
         .stats-grid {
             display: grid;
@@ -141,18 +112,9 @@
             box-shadow: 0 2px 8px rgba(0,0,0,0.05);
         }
         
-        .stat-card .number {
-            font-size: 2em;
-            font-weight: 700;
-            color: #014711;
-        }
+        .stat-card .number { font-size: 2em; font-weight: 700; color: #014711; }
+        .stat-card .label { font-size: 0.8em; color: #888; }
         
-        .stat-card .label {
-            font-size: 0.8em;
-            color: #888;
-        }
-        
-        /* ============ TICKET CARDS ============ */
         .ticket-card {
             background: white;
             border-radius: 10px;
@@ -163,19 +125,9 @@
             transition: all 0.3s;
         }
         
-        .ticket-card:hover {
-            box-shadow: 0 5px 20px rgba(0,0,0,0.1);
-            transform: translateX(3px);
-        }
-        
-        .ticket-card.priority-high {
-            border-left-color: #e74c3c;
-        }
-        
-        .ticket-card.priority-critical {
-            border-left-color: #c0392b;
-            background: #fff5f5;
-        }
+        .ticket-card:hover { box-shadow: 0 5px 20px rgba(0,0,0,0.1); transform: translateX(3px); }
+        .ticket-card.priority-high { border-left-color: #e74c3c; }
+        .ticket-card.priority-critical { border-left-color: #c0392b; background: #fff5f5; }
         
         .ticket-header {
             display: flex;
@@ -186,17 +138,9 @@
             gap: 8px;
         }
         
-        .ticket-id {
-            font-size: 1.1em;
-            font-weight: 700;
-            color: #014711;
-        }
+        .ticket-id { font-size: 1.1em; font-weight: 700; color: #014711; }
         
-        .badge-group {
-            display: flex;
-            gap: 8px;
-            flex-wrap: wrap;
-        }
+        .badge-group { display: flex; gap: 8px; flex-wrap: wrap; }
         
         .priority-badge {
             padding: 4px 12px;
@@ -206,20 +150,9 @@
             white-space: nowrap;
         }
         
-        .priority-medium {
-            background: #fff3cd;
-            color: #856404;
-        }
-        
-        .priority-high {
-            background: #ffe5e5;
-            color: #cc0000;
-        }
-        
-        .priority-critical {
-            background: #ff0000;
-            color: white;
-        }
+        .priority-medium { background: #fff3cd; color: #856404; }
+        .priority-high { background: #ffe5e5; color: #cc0000; }
+        .priority-critical { background: #ff0000; color: white; }
         
         .status-open {
             background: #e8f5e9;
@@ -241,12 +174,7 @@
             white-space: nowrap;
         }
         
-        .ticket-issue {
-            color: #555;
-            line-height: 1.6;
-            margin: 8px 0;
-            font-size: 0.9em;
-        }
+        .ticket-issue { color: #555; line-height: 1.6; margin: 8px 0; font-size: 0.9em; }
         
         .ticket-user {
             background: #f0f4f0;
@@ -268,12 +196,7 @@
             gap: 8px;
         }
         
-        .no-tickets {
-            text-align: center;
-            padding: 50px 20px;
-            color: #888;
-            font-size: 1.1em;
-        }
+        .no-tickets { text-align: center; padding: 50px 20px; color: #888; font-size: 1.1em; }
         
         .resolve-btn {
             background: #8dc73f;
@@ -303,10 +226,7 @@
             white-space: nowrap;
         }
         
-        .chat-btn:hover {
-            background: #8dc73f;
-            color: #014711;
-        }
+        .chat-btn:hover { background: #8dc73f; color: #014711; }
         
         .resolved-badge {
             background: #1a5632;
@@ -319,12 +239,8 @@
             display: inline-block;
         }
         
-        .resolve-btn:hover {
-            background: #014711;
-            color: white;
-        }
+        .resolve-btn:hover { background: #014711; color: white; }
         
-        /* ============ CHAT MODAL ============ */
         .chat-modal {
             display: none;
             position: fixed;
@@ -399,7 +315,6 @@
             50% { opacity: 0.3; transform: scale(1.3); }
         }
         
-        /* ============ MOBILE RESPONSIVE ============ */
         @media (max-width: 768px) {
             body { padding: 8px; }
             .header { padding: 14px 16px; flex-direction: column; align-items: flex-start; }
@@ -447,14 +362,12 @@
                 <button class="refresh-btn" onclick="loadTickets()">🔄 Refresh</button>
                 <button class="export-btn" onclick="exportCSV()">📥 Export CSV</button>
                 <button class="export-btn" onclick="toggleStats()">📊 Statistics</button>
-                <button class="export-btn" onclick="toggleBotStats()">📈 Bot Stats</button>
                 <img src="/static/Agmas LinkedIn Carousel.png" alt="Company Logo" 
                      style="width:45px; height:45px; border-radius:8px; object-fit:contain; background:white; padding:3px; margin-left:8px;"
                      onerror="this.style.display='none';">
             </div>
         </div>
         
-        <!-- STATS PANEL -->
         <div class="stats-panel" id="statsPanel">
             <h3 style="color:#014711; margin-bottom:15px;">📊 Monthly Statistics</h3>
             <div class="stats-grid" id="statsGrid"></div>
@@ -466,7 +379,6 @@
         </div>
     </div>
 
-    <!-- CHAT MODAL -->
     <div class="chat-modal" id="chatModal">
         <div class="chat-modal-box">
             <div class="chat-modal-header">
@@ -610,65 +522,6 @@
                 
             } catch (error) {
                 alert('Error loading stats: ' + error.message);
-            }
-        }
-        
-        async function toggleBotStats() {
-            try {
-                const response = await fetch('/api/bot-stats');
-                const data = await response.json();
-                
-                let statsHTML = `
-                    <div style="background:#f8faf7; border:2px solid #8dc73f; border-radius:12px; padding:20px; margin-bottom:20px;">
-                        <h3 style="color:#014711; margin-bottom:15px;">📈 Bot Usage Statistics</h3>
-                        <div style="display:grid; grid-template-columns:repeat(4,1fr); gap:15px; margin-bottom:15px;">
-                            <div style="text-align:center;">
-                                <div style="font-size:2em; font-weight:700; color:#014711;">${data.total_bot_sessions || 0}</div>
-                                <div style="font-size:0.8em; color:#888;">Bot Sessions</div>
-                            </div>
-                            <div style="text-align:center;">
-                                <div style="font-size:2em; font-weight:700; color:#8dc73f;">${data.bot_resolved || 0}</div>
-                                <div style="font-size:0.8em; color:#888;">Resolved by Bot</div>
-                            </div>
-                            <div style="text-align:center;">
-                                <div style="font-size:2em; font-weight:700; color:#e74c3c;">${data.escalated || 0}</div>
-                                <div style="font-size:0.8em; color:#888;">Escalated</div>
-                            </div>
-                            <div style="text-align:center;">
-                                <div style="font-size:2em; font-weight:700; color:#1a5632;">${data.total_tickets || 0}</div>
-                                <div style="font-size:0.8em; color:#888;">Total Tickets</div>
-                            </div>
-                        </div>
-                        <hr style="margin:15px 0;">
-                        <h4 style="margin-bottom:10px;">Staff Resolved by Bot (No Ticket Needed):</h4>
-                        ${data.bot_users && data.bot_users.length > 0 ? 
-                            data.bot_users.map(u => `
-                                <div style="display:flex; justify-content:space-between; padding:5px 0; border-bottom:1px solid #e0e0e0;">
-                                    <span>${u.staff_name || 'Unknown'}</span>
-                                    <span>${u.staff_email}</span>
-                                    <strong>${u.chat_count} chats</strong>
-                                </div>
-                            `).join('') 
-                            : '<p>No data yet</p>'}
-                        <hr style="margin:15px 0;">
-                        <h4 style="margin-bottom:10px;">Staff Who Escalated:</h4>
-                        ${data.escalated_users && data.escalated_users.length > 0 ? 
-                            data.escalated_users.map(u => `
-                                <div style="display:flex; justify-content:space-between; padding:5px 0; border-bottom:1px solid #e0e0e0;">
-                                    <span>${u.staff_name || 'Unknown'}</span>
-                                    <span>${u.staff_email}</span>
-                                    <strong>${u.ticket_count} tickets</strong>
-                                </div>
-                            `).join('') 
-                            : '<p>No escalations yet</p>'}
-                    </div>
-                `;
-                
-                document.getElementById('ticketsList').insertAdjacentHTML('beforebegin', statsHTML);
-                window.scrollTo(0, 0);
-                
-            } catch (error) {
-                alert('Error loading bot stats: ' + error.message);
             }
         }
         

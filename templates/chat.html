@@ -31,7 +31,6 @@
             overflow: hidden;
         }
 
-        /* ============ HEADER ============ */
         .chat-header {
             background: #014711;
             padding: 14px 20px;
@@ -110,7 +109,6 @@
             object-fit: contain;
         }
 
-        /* ============ NAME CAPTURE MODAL ============ */
         .name-modal {
             position: fixed;
             top: 0;
@@ -179,7 +177,6 @@
             color: white;
         }
 
-        /* ============ QUICK BUTTONS ============ */
         .quick-buttons {
             padding: 10px 16px;
             background: #ffffff;
@@ -217,7 +214,6 @@
             transform: scale(0.95);
         }
 
-        /* ============ CHAT MESSAGES ============ */
         .chat-messages {
             flex: 1;
             overflow-y: auto;
@@ -293,7 +289,6 @@
             transform: scale(1.02);
         }
 
-        /* ============ INPUT AREA ============ */
         .chat-input-area {
             padding: 12px 16px;
             background: #ffffff;
@@ -454,7 +449,6 @@
             font-size: 1.2em;
         }
 
-        /* ============ MOBILE RESPONSIVE ============ */
         @media (max-width: 768px) {
             body {
                 padding: 0;
@@ -638,7 +632,7 @@
             <div class="chat-modal-header">
                 <h3 style="flex:1;">💬 Chat with IT Support</h3>
                 <div style="display:flex; align-items:center; gap:5px; font-size:0.75em; color:#8dc73f; margin-right:15px;">
-                    <span style="width:8px; height:8px; background:#8dc73f; border-radius:50%; animation:pulse 2s infinite; display:inline-block;"></span>
+                <span style="width:8px; height:8px; background:#8dc73f; border-radius:50%; animation:pulse 2s infinite; display:inline-block;"></span>
                     Live
                 </div>
                 <button onclick="closeChat()" style="background:none; border:none; color:white; font-size:1.5em; cursor:pointer;">&times;</button>
@@ -698,24 +692,6 @@
             sendMessage();
         }
 
-        async function trackSession(issue, category, outcome) {
-            try {
-                await fetch('/api/track-session', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({
-                        staff_name: staffName || 'Unknown',
-                        staff_email: staffEmail || userId,
-                        issue: issue,
-                        category: category || '',
-                        outcome: outcome
-                    })
-                });
-            } catch (error) {
-                console.error('Tracking error:', error);
-            }
-        }
-
         async function sendMessage() {
             const input = document.getElementById('messageInput');
             const message = input.value.trim();
@@ -756,16 +732,8 @@
                 
                 addMessage(responseText, 'bot');
                 
-                // Track session
-                if (data.type === 'solution') {
-                    trackSession(message, data.solution ? data.solution.category : '', 'Resolved by Bot');
-                } else if (data.type === 'escalation') {
-                    trackSession(message, '', 'Escalated');
-                    if (data.ticket_id) {
-                        addChatButton(data.ticket_id);
-                    }
-                } else {
-                    trackSession(message, '', 'Chatted');
+                if (data.type === 'escalation' && data.ticket_id) {
+                    addChatButton(data.ticket_id);
                 }
                 
             } catch (error) {
