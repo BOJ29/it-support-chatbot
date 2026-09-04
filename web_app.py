@@ -36,9 +36,21 @@ def init_db():
             resolved_date TIMESTAMP
         )
     ''')
+    
+    # Create messages table for live chat
+    cursor.execute('''
+        CREATE TABLE IF NOT EXISTS messages (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            ticket_id INTEGER,
+            sender TEXT,
+            message TEXT,
+            created_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+        )
+    ''')
+    
     conn.commit()
     conn.close()
-    print("✅ Database initialized with staff columns")
+    print("✅ Database initialized with staff columns and messages table")
 
 init_db()
 
@@ -103,6 +115,48 @@ def get_tickets():
         print(f"Error fetching tickets: {e}")
         return jsonify([])
 
+@app.route('/api/ticket/<int:ticket_id>/messages', methods=['GET'])
+def get_messages(ticket_id):
+    """Get all messages for a ticket"""
+    try:
+        db_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'data', 'it_support.db')
+        conn = sqlite3.connect(db_path)
+        conn.row_factory = sqlite3.Row
+        cursor = conn.cursor()
+        cursor.execute('SELECT * FROM messages WHERE ticket_id = ? ORDER BY created_date ASC', (ticket_id,))
+        messages = [dict(row) for row in cursor.fetchall()]
+        conn.close()
+        return jsonify(messages)
+    except Exception as e:
+        print(f"Error getting messages: {e}")
+        return jsonify([])
+
+@app.route('/api/ticket/<int:ticket_id>/send', methods=['POST'])
+def send_message(ticket_id):
+    """Send a message for a ticket"""
+    try:
+        data = request.json
+        sender = data.get('sender', 'Unknown')
+        message = data.get('message', '')
+        
+        if not message:
+            return jsonify({'error': 'No message'}), 400
+        
+        db_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'data', 'it_support.db')
+        conn = sqlite3.connect(db_path)
+        cursor = conn.cursor()
+        cursor.execute('''
+            INSERT INTO messages (ticket_id, sender, message)
+            VALUES (?, ?, ?)
+        ''', (ticket_id, sender, message))
+        conn.commit()
+        conn.close()
+        
+        return jsonify({'success': True})
+    except Exception as e:
+        print(f"Error sending message: {e}")
+        return jsonify({'error': str(e)}), 500
+
 @app.route('/api/resolve/<int:ticket_id>', methods=['POST'])
 def resolve_ticket(ticket_id):
     """Mark a ticket as resolved"""
@@ -138,14 +192,11 @@ def export_tickets():
         tickets = [dict(row) for row in cursor.fetchall()]
         conn.close()
         
-        # Create CSV in memory
         output = io.StringIO()
         writer = csv.writer(output)
         
-        # Write header
         writer.writerow(['Ticket ID', 'Staff Name', 'Staff Email', 'Issue', 'Priority', 'Status', 'Created Date', 'Resolved Date'])
         
-        # Write data
         for ticket in tickets:
             writer.writerow([
                 ticket.get('id', ''),
@@ -184,7 +235,6 @@ def get_stats():
         
         current_month = datetime.now().strftime('%Y-%m')
         
-        # Get month stats
         cursor.execute("""
             SELECT 
                 COUNT(*) as total_tickets,
@@ -199,7 +249,6 @@ def get_stats():
         
         month_stats = dict(cursor.fetchone())
         
-        # Get category breakdown
         cursor.execute("""
             SELECT 
                 CASE 
