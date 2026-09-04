@@ -20,7 +20,6 @@ def init_db():
     conn = sqlite3.connect(db_path)
     cursor = conn.cursor()
     
-    # Drop old table to recreate with new columns
     cursor.execute('DROP TABLE IF EXISTS tickets')
     
     cursor.execute('''
@@ -37,7 +36,7 @@ def init_db():
         )
     ''')
     
-    # Create messages table for live chat
+    # Create messages table
     cursor.execute('''
         CREATE TABLE IF NOT EXISTS messages (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -54,7 +53,6 @@ def init_db():
 
 init_db()
 
-# Ensure data directory exists
 if not os.path.exists('data'):
     os.makedirs('data')
 
@@ -80,7 +78,6 @@ def chat():
         if not message:
             return jsonify({'error': 'No message provided'}), 400
         
-        # Pass staff info to chatbot
         response = chatbot.process_message(user_id, message, staff_name=staff_name, staff_email=staff_email)
         response['user_id'] = user_id
         response['staff_name'] = staff_name
@@ -115,6 +112,29 @@ def get_tickets():
         print(f"Error fetching tickets: {e}")
         return jsonify([])
 
+@app.route('/api/resolve/<int:ticket_id>', methods=['POST'])
+def resolve_ticket(ticket_id):
+    """Mark a ticket as resolved"""
+    try:
+        db_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'data', 'it_support.db')
+        conn = sqlite3.connect(db_path)
+        cursor = conn.cursor()
+        cursor.execute('''
+            UPDATE tickets 
+            SET status = 'Resolved'
+            WHERE id = ?
+        ''', (ticket_id,))
+        conn.commit()
+        conn.close()
+        return jsonify({'success': True})
+    except Exception as e:
+        print(f"Error resolving ticket: {e}")
+        return jsonify({'success': False, 'error': str(e)}), 500
+
+# ============================================
+# MESSAGING ROUTES
+# ============================================
+
 @app.route('/api/ticket/<int:ticket_id>/messages', methods=['GET'])
 def get_messages(ticket_id):
     """Get all messages for a ticket"""
@@ -133,10 +153,10 @@ def get_messages(ticket_id):
 
 @app.route('/api/ticket/<int:ticket_id>/send', methods=['POST'])
 def send_message(ticket_id):
-    """Send a message for a ticket"""
+    """Send a message from IT support"""
     try:
         data = request.json
-        sender = data.get('sender', 'Unknown')
+        sender = data.get('sender', 'IT Support')
         message = data.get('message', '')
         
         if not message:
@@ -157,24 +177,86 @@ def send_message(ticket_id):
         print(f"Error sending message: {e}")
         return jsonify({'error': str(e)}), 500
 
-@app.route('/api/resolve/<int:ticket_id>', methods=['POST'])
-def resolve_ticket(ticket_id):
-    """Mark a ticket as resolved"""
+@app.route('/api/user/<user_id>/messages', methods=['GET'])
+def get_user_messages(user_id):
+    """Get messages for a user's ticket"""
     try:
         db_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'data', 'it_support.db')
         conn = sqlite3.connect(db_path)
+        conn.row_factory = sqlite3.Row
         cursor = conn.cursor()
+        
         cursor.execute('''
-            UPDATE tickets 
-            SET status = 'Resolved'
-            WHERE id = ?
+            SELECT id FROM tickets 
+            WHERE user_id = ? OR staff_email = ?
+            ORDER BY created_date DESC 
+            LIMIT 1
+        ''', (user_id, user_id))
+        
+        ticket = cursor.fetchone()
+        
+        if not ticket:
+            conn.close()
+            return jsonify([])
+        
+        ticket_id = ticket['id']
+        
+        cursor.execute('''
+            SELECT * FROM messages 
+            WHERE ticket_id = ? 
+            ORDER BY created_date ASC
         ''', (ticket_id,))
+        
+        messages = [dict(row) for row in cursor.fetchall()]
+        conn.close()
+        return jsonify(messages)
+    except Exception as e:
+        print(f"Error getting user messages: {e}")
+        return jsonify([])
+
+@app.route('/api/user/<user_id>/reply', methods=['POST'])
+def user_reply(user_id):
+    """User replies to IT support message"""
+    try:
+        data = request.json
+        message = data.get('message', '')
+        
+        if not message:
+            return jsonify({'error': 'No message'}), 400
+        
+        db_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'data', 'it_support.db')
+        conn = sqlite3.connect(db_path)
+        conn.row_factory = sqlite3.Row
+        cursor = conn.cursor()
+        
+        cursor.execute('''
+            SELECT id, staff_name FROM tickets 
+            WHERE user_id = ? OR staff_email = ?
+            ORDER BY created_date DESC 
+            LIMIT 1
+        ''', (user_id, user_id))
+        
+        ticket = cursor.fetchone()
+        
+        if not ticket:
+            conn.close()
+            return jsonify({'error': 'No ticket found'}), 404
+        
+        ticket_id = ticket['id']
+        sender = ticket['staff_name'] or 'Staff'
+        
+        cursor.execute('''
+            INSERT INTO messages (ticket_id, sender, message)
+            VALUES (?, ?, ?)
+        ''', (ticket_id, sender, message))
+        
         conn.commit()
         conn.close()
+        
         return jsonify({'success': True})
     except Exception as e:
-        print(f"Error resolving ticket: {e}")
-        return jsonify({'success': False, 'error': str(e)}), 500
+        print(f"Error sending reply: {e}")
+        return jsonify({'error': str(e)}), 500
 
 # ============================================
 # EXPORT ROUTES
@@ -220,7 +302,6 @@ def export_tickets():
     except Exception as e:
         print(f"Export error: {e}")
         return jsonify({'error': str(e)}), 500
-
 
 @app.route('/api/stats')
 def get_stats():

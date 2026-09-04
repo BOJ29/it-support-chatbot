@@ -1,6 +1,7 @@
 from knowledge_manager import KnowledgeManager
 from ai_engine import AIEngine
 import os
+import sqlite3
 
 # Try to import email notifier, but don't crash if it fails
 try:
@@ -32,10 +33,11 @@ class ITSupportChatbot:
                 'last_issue': None,
                 'awaiting_feedback': False,
                 'staff_name': staff_name,
-                'staff_email': staff_email
+                'staff_email': staff_email,
+                'awaiting_reply': False,
+                'ticket_id': None
             }
         else:
-            # Update staff info if provided
             if staff_name:
                 self.user_sessions[user_id]['staff_name'] = staff_name
             if staff_email:
@@ -43,6 +45,14 @@ class ITSupportChatbot:
         
         session = self.user_sessions[user_id]
         message_lower = message.lower().strip()
+        
+        # Check if user wants to see IT support messages
+        if 'check messages' in message_lower or 'it support said' in message_lower or 'reply from it' in message_lower or 'any update' in message_lower:
+            return self._check_support_messages(user_id, session)
+        
+        # Check if user is replying to IT support
+        if session.get('awaiting_reply') and session.get('ticket_id'):
+            return self._send_reply_to_it(user_id, message, session)
         
         if session.get('awaiting_feedback'):
             return self._handle_feedback(user_id, message_lower, session)
@@ -76,6 +86,97 @@ class ITSupportChatbot:
             if session['attempts'] >= 3:
                 return self._escalate_issue(user_id, session)
             return self._ask_more_details(session)
+    
+    def _check_support_messages(self, user_id, session):
+        """Check if IT support has replied"""
+        try:
+            db_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'data', 'it_support.db')
+            conn = sqlite3.connect(db_path)
+            conn.row_factory = sqlite3.Row
+            cursor = conn.cursor()
+            
+            cursor.execute('''
+                SELECT id FROM tickets 
+                WHERE user_id = ? OR staff_email = ?
+                ORDER BY created_date DESC LIMIT 1
+            ''', (user_id, user_id))
+            
+            ticket = cursor.fetchone()
+            
+            if not ticket:
+                return {
+                    'message': "You don't have any open tickets.\n\nType 'escalate' to create a support ticket.",
+                    'type': 'clarification'
+                }
+            
+            cursor.execute('''
+                SELECT * FROM messages 
+                WHERE ticket_id = ? 
+                ORDER BY created_date ASC
+            ''', (ticket['id'],))
+            
+            messages = [dict(row) for row in cursor.fetchall()]
+            conn.close()
+            
+            if not messages:
+                return {
+                    'message': "📭 No messages from IT support yet.\n\nThey'll reply here soon. Type 'check messages' anytime to see updates.",
+                    'type': 'clarification'
+                }
+            
+            message_text = "💬 Messages from IT Support:\n\n"
+            for msg in messages:
+                message_text += f"**{msg['sender']}:** {msg['message']}\n\n"
+            
+            message_text += "━━━━━━━━━━━━━━━━\n"
+            message_text += "Type your reply below and it will be sent to IT support."
+            
+            session['awaiting_reply'] = True
+            session['ticket_id'] = ticket['id']
+            
+            return {
+                'message': message_text,
+                'type': 'support_messages',
+                'ticket_id': ticket['id']
+            }
+            
+        except Exception as e:
+            print(f"Error checking messages: {e}")
+            return {
+                'message': "Unable to check messages right now. Please try again.",
+                'type': 'clarification'
+            }
+    
+    def _send_reply_to_it(self, user_id, message, session):
+        """Send user's reply to IT support"""
+        try:
+            ticket_id = session.get('ticket_id')
+            staff_name = session.get('staff_name', 'Staff')
+            
+            db_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'data', 'it_support.db')
+            conn = sqlite3.connect(db_path)
+            cursor = conn.cursor()
+            cursor.execute('''
+                INSERT INTO messages (ticket_id, sender, message)
+                VALUES (?, ?, ?)
+            ''', (ticket_id, staff_name, message))
+            conn.commit()
+            conn.close()
+            
+            session['awaiting_reply'] = False
+            session['ticket_id'] = None
+            
+            return {
+                'message': "✅ Your reply has been sent to IT support!\n\nThey'll respond here. Type 'check messages' to see updates.",
+                'type': 'reply_sent'
+            }
+            
+        except Exception as e:
+            print(f"Error sending reply: {e}")
+            return {
+                'message': "❌ Failed to send reply. Please try again.",
+                'type': 'clarification'
+            }
     
     def _handle_feedback(self, user_id, message, session):
         positive_words = ['yes', 'yeah', 'yep', 'great', 'worked', 'working', 'solved',
@@ -117,7 +218,8 @@ class ITSupportChatbot:
             "• System Freezing\n"
             "• Software Installation\n\n"
             "Just describe your problem and I'll guide you!\n"
-            "For example: 'My printer is not working'"
+            "For example: 'My printer is not working'\n\n"
+            "💡 Type 'check messages' to see IT support replies."
         )
         return {'message': response, 'type': 'greeting'}
     
@@ -202,7 +304,6 @@ class ITSupportChatbot:
                 user_id, last_issue, priority, staff_name, staff_email
             )
             
-            # Try sending email if available
             if HAS_EMAIL:
                 try:
                     import threading
@@ -220,14 +321,15 @@ class ITSupportChatbot:
                 except Exception as e:
                     print(f"Email notification failed: {e}")
             
-            # Reset session
             self.user_sessions[user_id] = {
                 'attempts': 0,
                 'category': None,
                 'last_issue': None,
                 'awaiting_feedback': False,
                 'staff_name': staff_name,
-                'staff_email': staff_email
+                'staff_email': staff_email,
+                'awaiting_reply': False,
+                'ticket_id': ticket_id
             }
             
             return {
@@ -237,7 +339,7 @@ class ITSupportChatbot:
                     f"⚡ Priority: {priority}\n"
                     f"📋 Status: Open\n\n"
                     f"An IT staff member will address this shortly.\n\n"
-                    f"💡 While waiting, you can try restarting your computer."
+                    f"💡 Type 'check messages' to see IT support replies."
                 ),
                 'type': 'escalation',
                 'ticket_id': ticket_id,
@@ -252,7 +354,9 @@ class ITSupportChatbot:
                 'last_issue': None,
                 'awaiting_feedback': False,
                 'staff_name': staff_name,
-                'staff_email': staff_email
+                'staff_email': staff_email,
+                'awaiting_reply': False,
+                'ticket_id': None
             }
             return {
                 'message': (

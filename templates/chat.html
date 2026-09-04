@@ -31,7 +31,6 @@
             overflow: hidden;
         }
 
-        /* ============ HEADER ============ */
         .chat-header {
             background: #014711;
             padding: 14px 20px;
@@ -110,14 +109,6 @@
             object-fit: contain;
         }
 
-        .header-logo .logo-text {
-            font-size: 1.1em;
-            font-weight: 800;
-            color: #014711;
-            letter-spacing: -1px;
-        }
-
-        /* ============ NAME CAPTURE MODAL ============ */
         .name-modal {
             position: fixed;
             top: 0;
@@ -186,7 +177,6 @@
             color: white;
         }
 
-        /* ============ QUICK BUTTONS ============ */
         .quick-buttons {
             padding: 10px 16px;
             background: #ffffff;
@@ -224,7 +214,6 @@
             transform: scale(0.95);
         }
 
-        /* ============ CHAT MESSAGES ============ */
         .chat-messages {
             flex: 1;
             overflow-y: auto;
@@ -279,7 +268,26 @@
             letter-spacing: 0.3px;
         }
 
-        /* ============ INPUT AREA ============ */
+        .reply-btn {
+            display: block;
+            margin: 10px 0;
+            background: #014711;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 20px;
+            cursor: pointer;
+            font-family: 'Montserrat', sans-serif;
+            font-weight: 600;
+            font-size: 0.85em;
+            transition: all 0.3s;
+        }
+
+        .reply-btn:hover {
+            background: #8dc73f;
+            color: #014711;
+        }
+
         .chat-input-area {
             padding: 12px 16px;
             background: #ffffff;
@@ -343,7 +351,6 @@
             transform: scale(0.95);
         }
 
-        /* ============ SCROLLBAR ============ */
         .chat-messages::-webkit-scrollbar {
             width: 5px;
         }
@@ -361,7 +368,6 @@
             background: #014711;
         }
 
-        /* ============ MOBILE RESPONSIVE ============ */
         @media (max-width: 768px) {
             body {
                 padding: 0;
@@ -508,6 +514,7 @@
             <button class="quick-btn" onclick="sendQuickMessage('No internet connection')">🌐 Network</button>
             <button class="quick-btn" onclick="sendQuickMessage('Computer is freezing')">💻 System</button>
             <button class="quick-btn" onclick="sendQuickMessage('Cannot install software')">📦 Install</button>
+            <button class="quick-btn" onclick="sendQuickMessage('check messages')">💬 Check Messages</button>
         </div>
 
         <!-- CHAT MESSAGES -->
@@ -553,10 +560,7 @@
             staffName = name;
             staffEmail = email;
             
-            // Hide the modal
             document.getElementById('nameModal').style.display = 'none';
-            
-            // Welcome message with their name
             addMessage(`👋 Welcome <strong>${staffName}</strong>! How can I help you today?`, 'bot');
         }
 
@@ -611,6 +615,11 @@
                 
                 addMessage(responseText, 'bot');
                 
+                // If messages from IT support, add reply button
+                if (data.type === 'support_messages') {
+                    addReplyButton(data.ticket_id);
+                }
+                
             } catch (error) {
                 removeTyping(typingId);
                 addMessage('❌ Connection error: ' + error.message, 'bot');
@@ -618,6 +627,41 @@
             }
             
             isProcessing = false;
+        }
+
+        function addReplyButton(ticketId) {
+            const messagesDiv = document.getElementById('chatMessages');
+            const replyBtn = document.createElement('button');
+            replyBtn.className = 'reply-btn';
+            replyBtn.textContent = '💬 Reply to IT Support';
+            replyBtn.onclick = function() {
+                const reply = prompt('Type your reply:');
+                if (reply && reply.trim()) {
+                    sendReplyToIT(reply.trim(), ticketId);
+                }
+            };
+            messagesDiv.appendChild(replyBtn);
+            messagesDiv.scrollTop = messagesDiv.scrollHeight;
+        }
+
+        async function sendReplyToIT(message, ticketId) {
+            try {
+                const userIdentifier = staffEmail || userId;
+                
+                const response = await fetch('/api/user/' + userIdentifier + '/reply', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ message: message })
+                });
+                
+                if (response.ok) {
+                    addMessage('✅ Your reply has been sent to IT support!', 'bot');
+                } else {
+                    addMessage('❌ Failed to send reply. Try again.', 'bot');
+                }
+            } catch (error) {
+                addMessage('❌ Connection error. Try again.', 'bot');
+            }
         }
 
         function addMessage(text, sender) {
