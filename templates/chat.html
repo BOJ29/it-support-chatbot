@@ -369,6 +369,76 @@
             background: #014711;
         }
 
+        /* ============ CHAT MODAL ============ */
+        .chat-modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.7);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+            backdrop-filter: blur(5px);
+            -webkit-backdrop-filter: blur(5px);
+        }
+
+        .chat-modal-box {
+            background: white;
+            border-radius: 15px;
+            width: 90%;
+            max-width: 500px;
+            height: 70%;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        .chat-modal-header {
+            background: #014711;
+            color: white;
+            padding: 15px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .chat-modal-body {
+            flex: 1;
+            overflow-y: auto;
+            padding: 15px;
+            background: #f8faf7;
+        }
+
+        .chat-modal-input {
+            padding: 15px;
+            display: flex;
+            gap: 10px;
+            border-top: 1px solid #e0e0e0;
+        }
+
+        .chat-modal-input input {
+            flex: 1;
+            padding: 10px;
+            border: 2px solid #8dc73f;
+            border-radius: 20px;
+            outline: none;
+            font-family: 'Montserrat', sans-serif;
+        }
+
+        .chat-modal-input button {
+            background: #8dc73f;
+            color: #014711;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 20px;
+            font-weight: 700;
+            cursor: pointer;
+            font-family: 'Montserrat', sans-serif;
+        }
+
         @media (max-width: 768px) {
             body {
                 padding: 0;
@@ -447,6 +517,10 @@
             #sendButton {
                 padding: 10px 18px;
                 font-size: 0.85em;
+            }
+
+            .chat-modal-box {
+                height: 90%;
             }
         }
 
@@ -542,11 +616,29 @@
         </div>
     </div>
 
+    <!-- CHAT MODAL -->
+    <div class="chat-modal" id="chatModal">
+        <div class="chat-modal-box">
+            <div class="chat-modal-header">
+                <h3>💬 Chat with IT Support</h3>
+                <button onclick="closeChat()" style="background:none; border:none; color:white; font-size:1.5em; cursor:pointer;">&times;</button>
+            </div>
+            <div class="chat-modal-body" id="chatModalBody">
+                <p style="color:#888; text-align:center;">Connecting to IT Support...</p>
+            </div>
+            <div class="chat-modal-input">
+                <input type="text" id="chatModalInput" placeholder="Type your message...">
+                <button onclick="sendChatMessage()">Send</button>
+            </div>
+        </div>
+    </div>
+
     <script>
         let staffName = '';
         let staffEmail = '';
         const userId = 'user_' + Math.random().toString(36).substr(2, 9);
         let isProcessing = false;
+        let currentChatTicketId = null;
 
         function saveStaffInfo() {
             const name = document.getElementById('staffName').value.trim();
@@ -560,7 +652,6 @@
             staffName = name;
             staffEmail = email;
             
-            // Save for chat page
             localStorage.setItem('staffName', name);
             localStorage.setItem('staffEmail', email);
             
@@ -619,7 +710,6 @@
                 
                 addMessage(responseText, 'bot');
                 
-                // If escalated, show chat button
                 if (data.type === 'escalation' && data.ticket_id) {
                     addChatButton(data.ticket_id);
                 }
@@ -637,13 +727,92 @@
             const messagesDiv = document.getElementById('chatMessages');
             const chatBtn = document.createElement('button');
             chatBtn.className = 'chat-link-btn';
-            chatBtn.textContent = '💬 Open Chat with IT Support';
+            chatBtn.textContent = '💬 Chat with IT Support';
             chatBtn.onclick = function() {
-                window.open('/staff-chat?ticket_id=' + ticketId, '_blank');
+                openChat(ticketId);
             };
             messagesDiv.appendChild(chatBtn);
             messagesDiv.scrollTop = messagesDiv.scrollHeight;
         }
+
+        function openChat(ticketId) {
+            currentChatTicketId = ticketId;
+            document.getElementById('chatModal').style.display = 'flex';
+            loadChatMessages();
+        }
+
+        function closeChat() {
+            document.getElementById('chatModal').style.display = 'none';
+            currentChatTicketId = null;
+            addMessage('✅ Chat closed. Type "help" if you need assistance.', 'bot');
+        }
+
+        async function loadChatMessages() {
+            if (!currentChatTicketId) return;
+            
+            try {
+                const response = await fetch('/api/ticket/' + currentChatTicketId + '/messages');
+                const messages = await response.json();
+                
+                const chatDiv = document.getElementById('chatModalBody');
+                
+                if (messages.length === 0) {
+                    chatDiv.innerHTML = '<p style="color:#888; text-align:center;">👋 Say hello! IT Support is ready to help.</p>';
+                    return;
+                }
+                
+                chatDiv.innerHTML = messages.map(msg => {
+                    const isIT = msg.sender === 'IT Support';
+                    return `
+                        <div style="margin:10px 0; text-align:${isIT ? 'right' : 'left'};">
+                            <div style="display:inline-block; padding:10px 15px; border-radius:15px; 
+                                        background:${isIT ? '#014711' : '#e8f5e9'}; 
+                                        color:${isIT ? 'white' : '#333'};
+                                        max-width:80%;">
+                                <strong style="font-size:0.7em;">${msg.sender}</strong><br>
+                                ${msg.message}
+                            </div>
+                        </div>
+                    `;
+                }).join('');
+                
+                chatDiv.scrollTop = chatDiv.scrollHeight;
+                
+            } catch (error) {
+                console.error('Error loading messages:', error);
+            }
+        }
+
+        async function sendChatMessage() {
+            const input = document.getElementById('chatModalInput');
+            const message = input.value.trim();
+            
+            if (!message || !currentChatTicketId) return;
+            
+            try {
+                const response = await fetch('/api/ticket/' + currentChatTicketId + '/send', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ 
+                        sender: staffName || 'Staff', 
+                        message: message 
+                    })
+                });
+                
+                if (response.ok) {
+                    input.value = '';
+                    loadChatMessages();
+                }
+            } catch (error) {
+                alert('Error sending message');
+            }
+        }
+
+        setInterval(() => {
+            if (currentChatTicketId) {
+                loadChatMessages();
+            }
+        }, 3000);
 
         function addMessage(text, sender) {
             const messagesDiv = document.getElementById('chatMessages');
