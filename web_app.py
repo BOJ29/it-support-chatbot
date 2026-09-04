@@ -36,7 +36,6 @@ def init_db():
         )
     ''')
     
-    # Create messages table
     cursor.execute('''
         CREATE TABLE IF NOT EXISTS messages (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -64,6 +63,11 @@ if not os.path.exists('data'):
 def home():
     """Main chat interface for users"""
     return render_template('chat.html')
+
+@app.route('/staff-chat')
+def staff_chat():
+    """Dedicated chat page for staff"""
+    return render_template('staff_chat.html')
 
 @app.route('/api/chat', methods=['POST'])
 def chat():
@@ -153,10 +157,10 @@ def get_messages(ticket_id):
 
 @app.route('/api/ticket/<int:ticket_id>/send', methods=['POST'])
 def send_message(ticket_id):
-    """Send a message from IT support"""
+    """Send a message from IT support or staff"""
     try:
         data = request.json
-        sender = data.get('sender', 'IT Support')
+        sender = data.get('sender', 'Unknown')
         message = data.get('message', '')
         
         if not message:
@@ -175,87 +179,6 @@ def send_message(ticket_id):
         return jsonify({'success': True})
     except Exception as e:
         print(f"Error sending message: {e}")
-        return jsonify({'error': str(e)}), 500
-
-@app.route('/api/user/<user_id>/messages', methods=['GET'])
-def get_user_messages(user_id):
-    """Get messages for a user's ticket"""
-    try:
-        db_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'data', 'it_support.db')
-        conn = sqlite3.connect(db_path)
-        conn.row_factory = sqlite3.Row
-        cursor = conn.cursor()
-        
-        cursor.execute('''
-            SELECT id FROM tickets 
-            WHERE user_id = ? OR staff_email = ?
-            ORDER BY created_date DESC 
-            LIMIT 1
-        ''', (user_id, user_id))
-        
-        ticket = cursor.fetchone()
-        
-        if not ticket:
-            conn.close()
-            return jsonify([])
-        
-        ticket_id = ticket['id']
-        
-        cursor.execute('''
-            SELECT * FROM messages 
-            WHERE ticket_id = ? 
-            ORDER BY created_date ASC
-        ''', (ticket_id,))
-        
-        messages = [dict(row) for row in cursor.fetchall()]
-        conn.close()
-        return jsonify(messages)
-    except Exception as e:
-        print(f"Error getting user messages: {e}")
-        return jsonify([])
-
-@app.route('/api/user/<user_id>/reply', methods=['POST'])
-def user_reply(user_id):
-    """User replies to IT support message"""
-    try:
-        data = request.json
-        message = data.get('message', '')
-        
-        if not message:
-            return jsonify({'error': 'No message'}), 400
-        
-        db_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'data', 'it_support.db')
-        conn = sqlite3.connect(db_path)
-        conn.row_factory = sqlite3.Row
-        cursor = conn.cursor()
-        
-        cursor.execute('''
-            SELECT id, staff_name FROM tickets 
-            WHERE user_id = ? OR staff_email = ?
-            ORDER BY created_date DESC 
-            LIMIT 1
-        ''', (user_id, user_id))
-        
-        ticket = cursor.fetchone()
-        
-        if not ticket:
-            conn.close()
-            return jsonify({'error': 'No ticket found'}), 404
-        
-        ticket_id = ticket['id']
-        sender = ticket['staff_name'] or 'Staff'
-        
-        cursor.execute('''
-            INSERT INTO messages (ticket_id, sender, message)
-            VALUES (?, ?, ?)
-        ''', (ticket_id, sender, message))
-        
-        conn.commit()
-        conn.close()
-        
-        return jsonify({'success': True})
-    except Exception as e:
-        print(f"Error sending reply: {e}")
         return jsonify({'error': str(e)}), 500
 
 # ============================================
@@ -393,5 +316,6 @@ if __name__ == '__main__':
     port = int(os.environ.get('PORT', 5000))
     print("🚀 Starting IT Support Chatbot...")
     print(f"👤 User Chat:     http://0.0.0.0:{port}")
+    print(f"💬 Staff Chat:    http://0.0.0.0:{port}/staff-chat")
     print(f"📊 Admin Tickets: http://0.0.0.0:{port}/admin/tickets")
     app.run(debug=False, host='0.0.0.0', port=port)
