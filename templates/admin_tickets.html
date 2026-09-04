@@ -4,14 +4,25 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Ticket Dashboard - IT Support</title>
-    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <style>
+        :root {
+            --primary: #014711;
+            --secondary: #8dc73f;
+            --white: #ffffff;
+            --light-bg: #f8faf7;
+            --dark-text: #1a2e1a;
+            --gray-text: #666;
+            --shadow: 0 10px 40px rgba(1, 71, 17, 0.2);
+            --shadow-sm: 0 4px 15px rgba(0,0,0,0.06);
+        }
+
         * { margin: 0; padding: 0; box-sizing: border-box; }
         
         body {
             font-family: 'Montserrat', sans-serif;
-            background: #f5f7fa;
-            padding: 15px;
+            background: linear-gradient(135deg, #f0f4f0 0%, #e8f0e8 50%, #f0f4f0 100%);
+            padding: 20px;
             min-height: 100vh;
         }
         
@@ -21,78 +32,91 @@
         }
         
         .header {
-            background: #014711;
+            background: linear-gradient(135deg, #014711, #023d18);
             color: white;
-            padding: 18px 22px;
-            border-radius: 12px;
-            margin-bottom: 20px;
+            padding: 22px 28px;
+            border-radius: 20px;
+            margin-bottom: 25px;
             display: flex;
             justify-content: space-between;
             align-items: center;
             flex-wrap: wrap;
             gap: 15px;
-            box-shadow: 0 4px 15px rgba(1,71,17,0.2);
+            box-shadow: 0 15px 50px rgba(1,71,17,0.3);
+            position: relative;
+            overflow: hidden;
         }
         
-        .header h1 { font-size: 1.4em; font-weight: 700; }
-        .header p { opacity: 0.85; font-size: 0.8em; margin-top: 3px; }
+        .header::before {
+            content: '';
+            position: absolute;
+            top: -60%;
+            right: -10%;
+            width: 250px;
+            height: 250px;
+            background: rgba(141, 199, 63, 0.15);
+            border-radius: 50%;
+        }
+        
+        .header h1 { font-size: 1.5em; font-weight: 700; position: relative; z-index: 1; }
+        .header p { opacity: 0.85; font-size: 0.8em; margin-top: 4px; position: relative; z-index: 1; }
         
         .header-stats {
             display: flex;
             gap: 10px;
             flex-wrap: wrap;
             align-items: center;
+            position: relative;
+            z-index: 1;
         }
         
         .stat-box {
             background: rgba(255,255,255,0.15);
-            padding: 10px 18px;
-            border-radius: 10px;
+            backdrop-filter: blur(10px);
+            padding: 12px 20px;
+            border-radius: 14px;
             text-align: center;
             min-width: 70px;
+            border: 1px solid rgba(255,255,255,0.1);
         }
         
-        .stat-number { font-size: 1.5em; font-weight: 700; line-height: 1.2; }
+        .stat-number { font-size: 1.6em; font-weight: 700; line-height: 1.2; }
         .stat-label { font-size: 0.7em; opacity: 0.9; text-transform: uppercase; letter-spacing: 0.5px; }
         
-        .refresh-btn {
-            background: #8dc73f;
+        .refresh-btn, .export-btn {
+            background: linear-gradient(135deg, #8dc73f, #6ba832);
             color: #014711;
             border: none;
-            padding: 10px 18px;
-            border-radius: 8px;
+            padding: 11px 20px;
+            border-radius: 12px;
             font-weight: 700;
             font-family: 'Montserrat', sans-serif;
             cursor: pointer;
             font-size: 0.85em;
             transition: all 0.3s;
             white-space: nowrap;
+            box-shadow: 0 4px 15px rgba(141, 199, 63, 0.4);
         }
         
-        .export-btn {
-            background: #ffffff;
-            color: #014711;
-            border: none;
-            padding: 10px 18px;
-            border-radius: 8px;
-            font-weight: 700;
-            font-family: 'Montserrat', sans-serif;
-            cursor: pointer;
-            font-size: 0.85em;
-            transition: all 0.3s;
-            white-space: nowrap;
+        .refresh-btn:hover, .export-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 25px rgba(141, 199, 63, 0.5);
         }
-        
-        .export-btn:hover { background: #8dc73f; transform: scale(1.03); }
-        .refresh-btn:hover { background: white; color: #014711; }
         
         .stats-panel {
             display: none;
-            background: #f8faf7;
+            background: white;
             border: 2px solid #8dc73f;
-            border-radius: 12px;
-            padding: 20px;
+            border-radius: 16px;
+            padding: 25px;
             margin-bottom: 20px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.08);
+            animation: slideDown 0.4s ease-out;
+        }
+        
+        @keyframes slideDown {
+            from { opacity: 0; transform: translateY(-20px); }
+            to { opacity: 1; transform: translateY(0); }
         }
         
         .stats-panel.show { display: block; }
@@ -106,26 +130,36 @@
         
         .stat-card {
             text-align: center;
-            background: white;
-            padding: 15px;
-            border-radius: 10px;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+            background: linear-gradient(135deg, #f8faf7, #f0f4f0);
+            padding: 20px;
+            border-radius: 14px;
+            box-shadow: var(--shadow-sm);
         }
         
-        .stat-card .number { font-size: 2em; font-weight: 700; color: #014711; }
-        .stat-card .label { font-size: 0.8em; color: #888; }
+        .stat-card .number { font-size: 2.2em; font-weight: 700; color: #014711; }
+        .stat-card .label { font-size: 0.8em; color: #888; margin-top: 5px; }
         
         .ticket-card {
             background: white;
-            border-radius: 10px;
-            padding: 16px 20px;
-            margin-bottom: 12px;
-            border-left: 5px solid #8dc73f;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
-            transition: all 0.3s;
+            border-radius: 16px;
+            padding: 20px 24px;
+            margin-bottom: 14px;
+            border-left: 6px solid #8dc73f;
+            box-shadow: var(--shadow-sm);
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            animation: cardIn 0.5s ease-out;
         }
         
-        .ticket-card:hover { box-shadow: 0 5px 20px rgba(0,0,0,0.1); transform: translateX(3px); }
+        @keyframes cardIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .ticket-card:hover {
+            box-shadow: 0 15px 40px rgba(0,0,0,0.1);
+            transform: translateX(5px) scale(1.01);
+        }
+        
         .ticket-card.priority-high { border-left-color: #e74c3c; }
         .ticket-card.priority-critical { border-left-color: #c0392b; background: #fff5f5; }
         
@@ -133,18 +167,18 @@
             display: flex;
             justify-content: space-between;
             align-items: center;
-            margin-bottom: 10px;
+            margin-bottom: 12px;
             flex-wrap: wrap;
             gap: 8px;
         }
         
-        .ticket-id { font-size: 1.1em; font-weight: 700; color: #014711; }
+        .ticket-id { font-size: 1.2em; font-weight: 700; color: #014711; }
         
         .badge-group { display: flex; gap: 8px; flex-wrap: wrap; }
         
         .priority-badge {
-            padding: 4px 12px;
-            border-radius: 15px;
+            padding: 5px 14px;
+            border-radius: 20px;
             font-size: 0.75em;
             font-weight: 700;
             white-space: nowrap;
@@ -157,8 +191,8 @@
         .status-open {
             background: #e8f5e9;
             color: #2e7d32;
-            padding: 4px 12px;
-            border-radius: 15px;
+            padding: 5px 14px;
+            border-radius: 20px;
             font-size: 0.75em;
             font-weight: 600;
             white-space: nowrap;
@@ -167,20 +201,20 @@
         .status-resolved {
             background: #1a5632;
             color: #ffffff;
-            padding: 4px 12px;
-            border-radius: 15px;
+            padding: 5px 14px;
+            border-radius: 20px;
             font-size: 0.75em;
             font-weight: 600;
             white-space: nowrap;
         }
         
-        .ticket-issue { color: #555; line-height: 1.6; margin: 8px 0; font-size: 0.9em; }
+        .ticket-issue { color: #555; line-height: 1.6; margin: 10px 0; font-size: 0.9em; }
         
         .ticket-user {
-            background: #f0f4f0;
-            padding: 8px 12px;
-            border-radius: 8px;
-            margin: 8px 0;
+            background: linear-gradient(135deg, #f8faf7, #f0f4f0);
+            padding: 10px 14px;
+            border-radius: 10px;
+            margin: 10px 0;
             font-size: 0.85em;
             color: #333;
         }
@@ -189,57 +223,54 @@
             display: flex;
             justify-content: space-between;
             align-items: center;
-            margin-top: 12px;
+            margin-top: 14px;
             color: #888;
             font-size: 0.78em;
             flex-wrap: wrap;
             gap: 8px;
         }
         
-        .no-tickets { text-align: center; padding: 50px 20px; color: #888; font-size: 1.1em; }
+        .no-tickets { text-align: center; padding: 60px 20px; color: #888; font-size: 1.1em; }
         
-        .resolve-btn {
-            background: #8dc73f;
-            color: #014711;
+        .resolve-btn, .chat-btn {
             border: none;
-            padding: 7px 16px;
-            border-radius: 18px;
+            padding: 8px 18px;
+            border-radius: 25px;
             cursor: pointer;
             font-weight: 600;
             font-family: 'Montserrat', sans-serif;
             font-size: 0.82em;
             transition: all 0.3s;
             white-space: nowrap;
+        }
+        
+        .resolve-btn {
+            background: linear-gradient(135deg, #8dc73f, #6ba832);
+            color: #014711;
+            box-shadow: 0 4px 12px rgba(141, 199, 63, 0.4);
         }
         
         .chat-btn {
-            background: #014711;
+            background: linear-gradient(135deg, #014711, #023d18);
             color: white;
-            border: none;
-            padding: 7px 16px;
-            border-radius: 18px;
-            cursor: pointer;
-            font-weight: 600;
-            font-family: 'Montserrat', sans-serif;
-            font-size: 0.82em;
-            transition: all 0.3s;
-            white-space: nowrap;
+            box-shadow: 0 4px 12px rgba(1, 71, 17, 0.3);
         }
         
-        .chat-btn:hover { background: #8dc73f; color: #014711; }
+        .resolve-btn:hover, .chat-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(0,0,0,0.2);
+        }
         
         .resolved-badge {
             background: #1a5632;
             color: #ffffff;
-            padding: 7px 16px;
-            border-radius: 18px;
+            padding: 8px 18px;
+            border-radius: 25px;
             font-size: 0.82em;
             font-weight: 700;
             white-space: nowrap;
             display: inline-block;
         }
-        
-        .resolve-btn:hover { background: #014711; color: white; }
         
         .chat-modal {
             display: none;
@@ -248,29 +279,35 @@
             left: 0;
             width: 100%;
             height: 100%;
-            background: rgba(0,0,0,0.7);
+            background: rgba(1, 71, 17, 0.85);
+            backdrop-filter: blur(10px);
             z-index: 1000;
             justify-content: center;
             align-items: center;
-            backdrop-filter: blur(5px);
-            -webkit-backdrop-filter: blur(5px);
         }
         
         .chat-modal-box {
             background: white;
-            border-radius: 15px;
+            border-radius: 20px;
             width: 90%;
-            max-width: 500px;
+            max-width: 520px;
             height: 80%;
             display: flex;
             flex-direction: column;
             overflow: hidden;
+            box-shadow: 0 30px 80px rgba(0,0,0,0.4);
+            animation: slideUp 0.4s ease-out;
+        }
+        
+        @keyframes slideUp {
+            from { opacity: 0; transform: translateY(30px); }
+            to { opacity: 1; transform: translateY(0); }
         }
         
         .chat-modal-header {
-            background: #014711;
+            background: linear-gradient(135deg, #014711, #023d18);
             color: white;
-            padding: 15px;
+            padding: 18px 20px;
             display: flex;
             justify-content: space-between;
             align-items: center;
@@ -279,35 +316,48 @@
         .chat-modal-body {
             flex: 1;
             overflow-y: auto;
-            padding: 15px;
-            background: #f8faf7;
+            padding: 18px;
+            background: linear-gradient(180deg, #f8faf7, #f0f4f0);
         }
         
         .chat-modal-input {
-            padding: 15px;
+            padding: 16px;
             display: flex;
             gap: 10px;
-            border-top: 1px solid #e0e0e0;
+            border-top: 1px solid #f0f4f0;
+            background: white;
         }
         
         .chat-modal-input input {
             flex: 1;
-            padding: 10px;
-            border: 2px solid #8dc73f;
-            border-radius: 20px;
+            padding: 12px 16px;
+            border: 2px solid #e8f0e8;
+            border-radius: 25px;
             outline: none;
             font-family: 'Montserrat', sans-serif;
+            transition: all 0.3s;
+        }
+        
+        .chat-modal-input input:focus {
+            border-color: #8dc73f;
+            box-shadow: 0 0 0 4px rgba(141, 199, 63, 0.1);
         }
         
         .chat-modal-input button {
-            background: #8dc73f;
+            background: linear-gradient(135deg, #8dc73f, #6ba832);
             color: #014711;
             border: none;
-            padding: 10px 20px;
-            border-radius: 20px;
+            padding: 12px 22px;
+            border-radius: 25px;
             font-weight: 700;
             cursor: pointer;
             font-family: 'Montserrat', sans-serif;
+            transition: all 0.3s;
+            box-shadow: 0 4px 12px rgba(141, 199, 63, 0.4);
+        }
+        
+        .chat-modal-input button:hover {
+            transform: translateY(-2px);
         }
         
         @keyframes pulse {
@@ -316,30 +366,16 @@
         }
         
         @media (max-width: 768px) {
-            body { padding: 8px; }
-            .header { padding: 14px 16px; flex-direction: column; align-items: flex-start; }
+            body { padding: 10px; }
+            .header { padding: 16px 18px; flex-direction: column; align-items: flex-start; }
             .header h1 { font-size: 1.2em; }
             .header-stats { width: 100%; justify-content: space-between; flex-wrap: wrap; }
             .stat-box { padding: 8px 14px; min-width: 60px; }
             .stat-number { font-size: 1.3em; }
-            .ticket-card { padding: 14px 16px; }
+            .ticket-card { padding: 16px 18px; }
             .ticket-id { font-size: 1em; }
-            .ticket-issue { font-size: 0.85em; }
-            .ticket-footer { font-size: 0.72em; }
             .stats-grid { grid-template-columns: 1fr; }
             .chat-modal-box { height: 90%; }
-        }
-        
-        @media (max-width: 480px) {
-            .header-stats { gap: 8px; }
-            .stat-box { padding: 6px 10px; min-width: 50px; }
-            .stat-number { font-size: 1.1em; }
-            .stat-label { font-size: 0.6em; }
-            .refresh-btn, .export-btn { padding: 8px 14px; font-size: 0.78em; }
-            .ticket-card { padding: 12px 14px; }
-            .ticket-header { gap: 6px; }
-            .priority-badge, .status-open, .status-resolved { font-size: 0.7em; padding: 3px 10px; }
-            .resolve-btn, .chat-btn { padding: 6px 14px; font-size: 0.75em; }
         }
     </style>
 </head>
@@ -364,7 +400,7 @@
                 <button class="export-btn" onclick="toggleStats()">📊 Statistics</button>
                 <button class="export-btn" onclick="toggleBotStats()">📈 Bot Stats</button>
                 <img src="/static/Agmas LinkedIn Carousel.png" alt="Company Logo" 
-                     style="width:45px; height:45px; border-radius:8px; object-fit:contain; background:white; padding:3px; margin-left:8px;"
+                     style="width:45px; height:45px; border-radius:12px; object-fit:contain; background:white; padding:4px; margin-left:8px; box-shadow:0 4px 12px rgba(0,0,0,0.2);"
                      onerror="this.style.display='none';">
             </div>
         </div>
@@ -532,22 +568,22 @@
                 const data = await response.json();
                 
                 let statsHTML = `
-                    <div style="background:#f8faf7; border:2px solid #8dc73f; border-radius:12px; padding:20px; margin-bottom:20px;">
+                    <div style="background:white; border:2px solid #8dc73f; border-radius:16px; padding:25px; margin-bottom:20px; box-shadow:0 10px 40px rgba(0,0,0,0.08);">
                         <h3 style="color:#014711; margin-bottom:15px;">📈 Bot Usage Analytics</h3>
                         <div style="display:grid; grid-template-columns:repeat(4,1fr); gap:15px; margin-bottom:15px;">
-                            <div style="text-align:center; background:white; padding:15px; border-radius:10px;">
+                            <div style="text-align:center; background:linear-gradient(135deg,#f8faf7,#f0f4f0); padding:18px; border-radius:12px;">
                                 <div style="font-size:2em; font-weight:700; color:#014711;">${data.total_bot_sessions || 0}</div>
                                 <div style="font-size:0.8em; color:#888;">Bot Sessions</div>
                             </div>
-                            <div style="text-align:center; background:white; padding:15px; border-radius:10px;">
+                            <div style="text-align:center; background:linear-gradient(135deg,#f8faf7,#f0f4f0); padding:18px; border-radius:12px;">
                                 <div style="font-size:2em; font-weight:700; color:#8dc73f;">${data.bot_resolved || 0}</div>
                                 <div style="font-size:0.8em; color:#888;">Resolved by Bot</div>
                             </div>
-                            <div style="text-align:center; background:white; padding:15px; border-radius:10px;">
+                            <div style="text-align:center; background:linear-gradient(135deg,#f8faf7,#f0f4f0); padding:18px; border-radius:12px;">
                                 <div style="font-size:2em; font-weight:700; color:#e74c3c;">${data.escalated || 0}</div>
                                 <div style="font-size:0.8em; color:#888;">Escalated</div>
                             </div>
-                            <div style="text-align:center; background:white; padding:15px; border-radius:10px;">
+                            <div style="text-align:center; background:linear-gradient(135deg,#f8faf7,#f0f4f0); padding:18px; border-radius:12px;">
                                 <div style="font-size:2em; font-weight:700; color:#1a5632;">${data.total_tickets || 0}</div>
                                 <div style="font-size:0.8em; color:#888;">Total Tickets</div>
                             </div>
@@ -615,7 +651,7 @@
                     return `
                         <div style="margin:10px 0; text-align:${isIT ? 'right' : 'left'};">
                             <div style="display:inline-block; padding:10px 15px; border-radius:15px; 
-                                        background:${isIT ? '#014711' : '#e8f5e9'}; 
+                                        background:${isIT ? 'linear-gradient(135deg,#014711,#023d18)' : '#e8f5e9'}; 
                                         color:${isIT ? 'white' : '#333'};
                                         max-width:80%;">
                                 <strong style="font-size:0.7em;">${msg.sender}</strong><br>
