@@ -252,6 +252,8 @@
             z-index: 1000;
             justify-content: center;
             align-items: center;
+            backdrop-filter: blur(5px);
+            -webkit-backdrop-filter: blur(5px);
         }
         
         .chat-modal-box {
@@ -375,12 +377,13 @@
     <div class="chat-modal" id="chatModal">
         <div class="chat-modal-box">
             <div class="chat-modal-header">
-                <h3>💬 Ticket Chat <span id="chatTicketId"></span> 
-    <span style="font-size:0.7em; color:#8dc73f; display:inline-flex; align-items:center; gap:5px;">
-        <span style="width:8px; height:8px; background:#8dc73f; border-radius:50%; animation:pulse 2s infinite;"></span>
-        Live
-    </span>
-</h3>
+                <div style="display:flex; align-items:center; gap:10px;">
+                    <h3>💬 Ticket Chat <span id="chatTicketId"></span></h3>
+                    <span style="display:flex; align-items:center; gap:5px; font-size:0.7em; color:#8dc73f;">
+                        <span style="width:8px; height:8px; background:#8dc73f; border-radius:50%; animation:pulse 2s infinite;"></span>
+                        Live
+                    </span>
+                </div>
                 <button onclick="closeChat()" style="background:none; border:none; color:white; font-size:1.5em; cursor:pointer;">&times;</button>
             </div>
             <div class="chat-modal-body" id="chatMessages">
@@ -545,17 +548,30 @@
                     return;
                 }
                 
-                chatDiv.innerHTML = messages.map(msg => `
-                    <div style="margin:10px 0; text-align:${msg.sender === 'IT Support' ? 'right' : 'left'};">
-                        <div style="display:inline-block; padding:10px 15px; border-radius:15px; 
-                                    background:${msg.sender === 'IT Support' ? '#014711' : '#e8f5e9'}; 
-                                    color:${msg.sender === 'IT Support' ? 'white' : '#333'};
-                                    max-width:80%;">
-                            <strong style="font-size:0.7em;">${msg.sender}</strong><br>
-                            ${msg.message}
+                chatDiv.innerHTML = messages.map(msg => {
+                    const isIT = msg.sender === 'IT Support';
+                    const isImage = msg.message.startsWith('[Image]');
+                    
+                    let content;
+                    if (isImage) {
+                        const imageUrl = msg.message.replace('[Image] ', '');
+                        content = `<img src="${imageUrl}" style="max-width:200px; border-radius:10px; display:block; margin-top:5px;" onclick="window.open(this.src)">`;
+                    } else {
+                        content = msg.message;
+                    }
+                    
+                    return `
+                        <div style="margin:10px 0; text-align:${isIT ? 'right' : 'left'};">
+                            <div style="display:inline-block; padding:10px 15px; border-radius:15px; 
+                                        background:${isIT ? '#014711' : '#e8f5e9'}; 
+                                        color:${isIT ? 'white' : '#333'};
+                                        max-width:80%;">
+                                <strong style="font-size:0.7em;">${msg.sender}</strong><br>
+                                ${content}
+                            </div>
                         </div>
-                    </div>
-                `).join('');
+                    `;
+                }).join('');
                 
                 chatDiv.scrollTop = chatDiv.scrollHeight;
                 
@@ -593,7 +609,7 @@
             if (currentTicketId) {
                 loadChatMessages();
             }
-        }, 5000);
+        }, 3000);
         
         loadTickets();
         setInterval(loadTickets, 30000);

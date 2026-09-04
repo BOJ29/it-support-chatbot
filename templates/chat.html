@@ -88,7 +88,7 @@
 
         @keyframes pulse {
             0%, 100% { opacity: 1; transform: scale(1); }
-            50% { opacity: 0.5; transform: scale(1.3); }
+            50% { opacity: 0.3; transform: scale(1.3); }
         }
 
         .header-logo {
@@ -419,7 +419,7 @@
             border-top: 1px solid #e0e0e0;
         }
 
-        .chat-modal-input input {
+        .chat-modal-input input[type="text"] {
             flex: 1;
             padding: 10px;
             border: 2px solid #8dc73f;
@@ -437,6 +437,16 @@
             font-weight: 700;
             cursor: pointer;
             font-family: 'Montserrat', sans-serif;
+        }
+
+        .attach-btn {
+            background: #014711;
+            color: white;
+            border: none;
+            padding: 10px 15px;
+            border-radius: 50%;
+            cursor: pointer;
+            font-size: 1.2em;
         }
 
         @media (max-width: 768px) {
@@ -620,15 +630,24 @@
     <div class="chat-modal" id="chatModal">
         <div class="chat-modal-box">
             <div class="chat-modal-header">
-    <div style="display:flex; align-items:center; gap:10px;">
-        <h3>💬 Chat with IT Support</h3>
-        <span style="display:flex; align-items:center; gap:5px; font-size:0.75em; color:#8dc73f;">
-            <span style="width:8px; height:8px; background:#8dc73f; border-radius:50%; animation:pulse 2s infinite; display:inline-block;"></span>
-            Live
-        </span>
-    </div>
-    <button onclick="closeChat()" style="background:none; border:none; color:white; font-size:1.5em; cursor:pointer;">&times;</button>
-</div>
+                <div style="display:flex; align-items:center; gap:10px;">
+                    <h3>💬 Chat with IT Support</h3>
+                    <span style="display:flex; align-items:center; gap:5px; font-size:0.75em; color:#8dc73f;">
+                        <span style="width:8px; height:8px; background:#8dc73f; border-radius:50%; animation:pulse 2s infinite; display:inline-block;"></span>
+                        Live
+                    </span>
+                </div>
+                <button onclick="closeChat()" style="background:none; border:none; color:white; font-size:1.5em; cursor:pointer;">&times;</button>
+            </div>
+            <div class="chat-modal-body" id="chatModalBody">
+                <p style="color:#888; text-align:center;">Connecting to IT Support...</p>
+            </div>
+            <div class="chat-modal-input">
+                <input type="file" id="imageInput" accept="image/*" style="display:none;" onchange="uploadImage()">
+                <button class="attach-btn" onclick="document.getElementById('imageInput').click()" title="Attach image">📎</button>
+                <input type="text" id="chatModalInput" placeholder="Type your message..." autocomplete="off">
+                <button onclick="sendChatMessage()">Send</button>
+            </div>
         </div>
     </div>
 
@@ -661,6 +680,12 @@
         document.getElementById('messageInput').addEventListener('keypress', function(e) {
             if (e.key === 'Enter' && !isProcessing) {
                 sendMessage();
+            }
+        });
+
+        document.getElementById('chatModalInput').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                sendChatMessage();
             }
         });
 
@@ -762,14 +787,24 @@
                 
                 chatDiv.innerHTML = messages.map(msg => {
                     const isIT = msg.sender === 'IT Support';
+                    const isImage = msg.message.startsWith('[Image]');
+                    
+                    let content;
+                    if (isImage) {
+                        const imageUrl = msg.message.replace('[Image] ', '');
+                        content = `<img src="${imageUrl}" style="max-width:200px; border-radius:10px; display:block; margin-top:5px;" onclick="window.open(this.src)">`;
+                    } else {
+                        content = msg.message;
+                    }
+                    
                     return `
                         <div style="margin:10px 0; text-align:${isIT ? 'left' : 'right'};">
                             <div style="display:inline-block; padding:10px 15px; border-radius:15px; 
-                                        background:${isIT ? '#014711' : '#e8f5e9'}; 
-                                        color:${isIT ? 'white' : '#333'};
+                                        background:${isIT ? '#014711' : '#8dc73f'}; 
+                                        color:${isIT ? 'white' : '#014711'};
                                         max-width:80%;">
                                 <strong style="font-size:0.7em;">${msg.sender}</strong><br>
-                                ${msg.message}
+                                ${content}
                             </div>
                         </div>
                     `;
@@ -805,6 +840,44 @@
             } catch (error) {
                 alert('Error sending message');
             }
+        }
+
+        async function uploadImage() {
+            const fileInput = document.getElementById('imageInput');
+            const file = fileInput.files[0];
+            
+            if (!file || !currentChatTicketId) return;
+            
+            if (file.size > 5 * 1024 * 1024) {
+                alert('Image too large. Max 5MB.');
+                return;
+            }
+            
+            const reader = new FileReader();
+            reader.onload = async function(e) {
+                try {
+                    const response = await fetch('/api/upload-image', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({
+                            ticket_id: currentChatTicketId,
+                            sender: staffName || 'Staff',
+                            image: e.target.result
+                        })
+                    });
+                    
+                    if (response.ok) {
+                        loadChatMessages();
+                    } else {
+                        alert('Upload failed');
+                    }
+                } catch (error) {
+                    alert('Error uploading: ' + error.message);
+                }
+            };
+            reader.readAsDataURL(file);
+            
+            fileInput.value = '';
         }
 
         setInterval(() => {

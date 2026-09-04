@@ -6,6 +6,8 @@ import uuid
 import os
 import csv
 import io
+import base64
+import time
 
 app = Flask(__name__)
 CORS(app)
@@ -63,11 +65,6 @@ if not os.path.exists('data'):
 def home():
     """Main chat interface for users"""
     return render_template('chat.html')
-
-@app.route('/staff-chat')
-def staff_chat():
-    """Dedicated chat page for staff"""
-    return render_template('staff_chat.html')
 
 @app.route('/api/chat', methods=['POST'])
 def chat():
@@ -179,6 +176,55 @@ def send_message(ticket_id):
         return jsonify({'success': True})
     except Exception as e:
         print(f"Error sending message: {e}")
+        return jsonify({'error': str(e)}), 500
+
+@app.route('/api/upload-image', methods=['POST'])
+def upload_image():
+    """Upload image for chat"""
+    try:
+        data = request.json
+        ticket_id = data.get('ticket_id')
+        sender = data.get('sender', 'Staff')
+        image_data = data.get('image', '')
+        
+        if not ticket_id or not image_data:
+            return jsonify({'error': 'Missing data'}), 400
+        
+        # Decode base64 image
+        if ',' in image_data:
+            image_bytes = base64.b64decode(image_data.split(',')[1])
+        else:
+            image_bytes = base64.b64decode(image_data)
+        
+        # Create uploads folder
+        uploads_dir = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'static', 'uploads')
+        if not os.path.exists(uploads_dir):
+            os.makedirs(uploads_dir)
+        
+        # Save image
+        image_filename = f"chat_{ticket_id}_{int(time.time())}.png"
+        image_path = os.path.join(uploads_dir, image_filename)
+        
+        with open(image_path, 'wb') as f:
+            f.write(image_bytes)
+        
+        # Save message
+        image_url = f"/static/uploads/{image_filename}"
+        message_text = f"[Image] {image_url}"
+        
+        db_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'data', 'it_support.db')
+        conn = sqlite3.connect(db_path)
+        cursor = conn.cursor()
+        cursor.execute('''
+            INSERT INTO messages (ticket_id, sender, message)
+            VALUES (?, ?, ?)
+        ''', (ticket_id, sender, message_text))
+        conn.commit()
+        conn.close()
+        
+        return jsonify({'success': True, 'image_url': image_url})
+    except Exception as e:
+        print(f"Upload error: {e}")
         return jsonify({'error': str(e)}), 500
 
 # ============================================
@@ -316,6 +362,5 @@ if __name__ == '__main__':
     port = int(os.environ.get('PORT', 5000))
     print("🚀 Starting IT Support Chatbot...")
     print(f"👤 User Chat:     http://0.0.0.0:{port}")
-    print(f"💬 Staff Chat:    http://0.0.0.0:{port}/staff-chat")
     print(f"📊 Admin Tickets: http://0.0.0.0:{port}/admin/tickets")
     app.run(debug=False, host='0.0.0.0', port=port)
