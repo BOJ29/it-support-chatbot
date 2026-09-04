@@ -620,16 +620,15 @@
     <div class="chat-modal" id="chatModal">
         <div class="chat-modal-box">
             <div class="chat-modal-header">
-                <h3>💬 Chat with IT Support</h3>
-                <button onclick="closeChat()" style="background:none; border:none; color:white; font-size:1.5em; cursor:pointer;">&times;</button>
-            </div>
-            <div class="chat-modal-body" id="chatModalBody">
-                <p style="color:#888; text-align:center;">Connecting to IT Support...</p>
-            </div>
-            <div class="chat-modal-input">
-                <input type="text" id="chatModalInput" placeholder="Type your message...">
-                <button onclick="sendChatMessage()">Send</button>
-            </div>
+    <div style="display:flex; align-items:center; gap:10px;">
+        <h3>💬 Chat with IT Support</h3>
+        <span style="display:flex; align-items:center; gap:5px; font-size:0.75em; color:#8dc73f;">
+            <span style="width:8px; height:8px; background:#8dc73f; border-radius:50%; animation:pulse 2s infinite; display:inline-block;"></span>
+            Live
+        </span>
+    </div>
+    <button onclick="closeChat()" style="background:none; border:none; color:white; font-size:1.5em; cursor:pointer;">&times;</button>
+</div>
         </div>
     </div>
 
