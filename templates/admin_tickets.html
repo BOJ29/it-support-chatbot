@@ -310,6 +310,11 @@
             font-family: 'Montserrat', sans-serif;
         }
         
+        @keyframes pulse {
+            0%, 100% { opacity: 1; transform: scale(1); }
+            50% { opacity: 0.3; transform: scale(1.3); }
+        }
+        
         @media (max-width: 768px) {
             body { padding: 8px; }
             .header { padding: 14px 16px; flex-direction: column; align-items: flex-start; }
@@ -377,12 +382,10 @@
     <div class="chat-modal" id="chatModal">
         <div class="chat-modal-box">
             <div class="chat-modal-header">
-                <div style="display:flex; align-items:center; gap:10px;">
-                    <h3>💬 Ticket Chat <span id="chatTicketId"></span></h3>
-                    <span style="display:flex; align-items:center; gap:5px; font-size:0.7em; color:#8dc73f;">
-                        <span style="width:8px; height:8px; background:#8dc73f; border-radius:50%; animation:pulse 2s infinite;"></span>
-                        Live
-                    </span>
+                <h3 style="flex:1;">💬 Ticket Chat <span id="chatTicketId"></span></h3>
+                <div style="display:flex; align-items:center; gap:5px; font-size:0.7em; color:#8dc73f; margin-right:15px;">
+                    <span style="width:8px; height:8px; background:#8dc73f; border-radius:50%; animation:pulse 2s infinite; display:inline-block;"></span>
+                    Live
                 </div>
                 <button onclick="closeChat()" style="background:none; border:none; color:white; font-size:1.5em; cursor:pointer;">&times;</button>
             </div>

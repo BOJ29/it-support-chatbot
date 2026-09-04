@@ -13,6 +13,11 @@ app = Flask(__name__)
 CORS(app)
 chatbot = ITSupportChatbot()
 
+# Ensure uploads folder exists
+uploads_dir = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'static', 'uploads')
+if not os.path.exists(uploads_dir):
+    os.makedirs(uploads_dir)
+
 # Create database if it doesn't exist
 def init_db():
     db_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'data', 'it_support.db')
@@ -196,7 +201,7 @@ def upload_image():
         else:
             image_bytes = base64.b64decode(image_data)
         
-        # Create uploads folder
+        # Create uploads folder if not exists
         uploads_dir = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'static', 'uploads')
         if not os.path.exists(uploads_dir):
             os.makedirs(uploads_dir)
@@ -208,7 +213,7 @@ def upload_image():
         with open(image_path, 'wb') as f:
             f.write(image_bytes)
         
-        # Save message
+        # Save message with image reference
         image_url = f"/static/uploads/{image_filename}"
         message_text = f"[Image] {image_url}"
         
