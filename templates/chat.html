@@ -692,6 +692,24 @@
             sendMessage();
         }
 
+        async function trackSession(issue, category, outcome) {
+            try {
+                await fetch('/api/track-session', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        staff_name: staffName || 'Unknown',
+                        staff_email: staffEmail || userId,
+                        issue: issue,
+                        category: category || '',
+                        outcome: outcome
+                    })
+                });
+            } catch (error) {
+                console.error('Tracking error:', error);
+            }
+        }
+
         async function sendMessage() {
             const input = document.getElementById('messageInput');
             const message = input.value.trim();
@@ -731,6 +749,17 @@
                 }
                 
                 addMessage(responseText, 'bot');
+                
+                // Track session outcome
+                if (data.type === 'solution') {
+                    trackSession(message, data.solution ? data.solution.category : '', 'Resolved by Bot');
+                } else if (data.type === 'escalation') {
+                    trackSession(message, '', 'Escalated');
+                } else if (data.type === 'feedback_positive') {
+                    trackSession(message, '', 'Resolved by Bot');
+                } else {
+                    trackSession(message, '', 'Chatted');
+                }
                 
                 if (data.type === 'escalation' && data.ticket_id) {
                     addChatButton(data.ticket_id);

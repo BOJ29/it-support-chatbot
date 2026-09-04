@@ -53,9 +53,22 @@ def init_db():
         )
     ''')
     
+    # NEW: bot_sessions table for tracking non-escalated chats
+    cursor.execute('''
+        CREATE TABLE IF NOT EXISTS bot_sessions (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            staff_name TEXT,
+            staff_email TEXT,
+            issue TEXT,
+            category TEXT,
+            outcome TEXT DEFAULT 'Chatted',
+            created_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+        )
+    ''')
+    
     conn.commit()
     conn.close()
-    print("✅ Database initialized with staff columns and messages table")
+    print("✅ Database initialized with staff columns, messages, and bot_sessions tables")
 
 init_db()
 
@@ -230,6 +243,79 @@ def upload_image():
         return jsonify({'success': True, 'image_url': image_url})
     except Exception as e:
         print(f"Upload error: {e}")
+        return jsonify({'error': str(e)}), 500
+
+# ============================================
+# BOT SESSION TRACKING ROUTES (NEW)
+# ============================================
+
+@app.route('/api/track-session', methods=['POST'])
+def track_session():
+    """Track staff chat session"""
+    try:
+        data = request.json
+        staff_name = data.get('staff_name', '')
+        staff_email = data.get('staff_email', '')
+        issue = data.get('issue', '')
+        category = data.get('category', '')
+        outcome = data.get('outcome', 'Chatted')
+        
+        db_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'data', 'it_support.db')
+        conn = sqlite3.connect(db_path)
+        cursor = conn.cursor()
+        cursor.execute('''
+            INSERT INTO bot_sessions (staff_name, staff_email, issue, category, outcome)
+            VALUES (?, ?, ?, ?, ?)
+        ''', (staff_name, staff_email, issue, category, outcome))
+        conn.commit()
+        conn.close()
+        
+        return jsonify({'success': True})
+    except Exception as e:
+        print(f"Error tracking session: {e}")
+        return jsonify({'error': str(e)}), 500
+
+@app.route('/api/bot-stats')
+def get_bot_stats():
+    """Get statistics on bot usage"""
+    try:
+        db_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'data', 'it_support.db')
+        conn = sqlite3.connect(db_path)
+        conn.row_factory = sqlite3.Row
+        cursor = conn.cursor()
+        
+        cursor.execute('SELECT COUNT(*) as total FROM bot_sessions')
+        total_bot = cursor.fetchone()['total']
+        
+        cursor.execute("SELECT COUNT(*) as resolved FROM bot_sessions WHERE outcome = 'Resolved by Bot'")
+        bot_resolved = cursor.fetchone()['resolved']
+        
+        cursor.execute("SELECT COUNT(*) as escalated FROM bot_sessions WHERE outcome = 'Escalated'")
+        escalated = cursor.fetchone()['escalated']
+        
+        cursor.execute('SELECT COUNT(*) as total_tickets FROM tickets')
+        total_tickets = cursor.fetchone()['total_tickets']
+        
+        cursor.execute("""
+            SELECT staff_name, staff_email, COUNT(*) as chat_count 
+            FROM bot_sessions 
+            WHERE outcome = 'Resolved by Bot'
+            GROUP BY staff_email
+            ORDER BY chat_count DESC
+        """)
+        bot_users = [dict(row) for row in cursor.fetchall()]
+        
+        conn.close()
+        
+        return jsonify({
+            'total_bot_sessions': total_bot,
+            'bot_resolved': bot_resolved,
+            'escalated': escalated,
+            'total_tickets': total_tickets,
+            'bot_users': bot_users
+        })
+    except Exception as e:
+        print(f"Stats error: {e}")
         return jsonify({'error': str(e)}), 500
 
 # ============================================

@@ -362,6 +362,7 @@
                 <button class="refresh-btn" onclick="loadTickets()">🔄 Refresh</button>
                 <button class="export-btn" onclick="exportCSV()">📥 Export CSV</button>
                 <button class="export-btn" onclick="toggleStats()">📊 Statistics</button>
+                <button class="export-btn" onclick="toggleBotStats()">📈 Bot Stats</button>
                 <img src="/static/Agmas LinkedIn Carousel.png" alt="Company Logo" 
                      style="width:45px; height:45px; border-radius:8px; object-fit:contain; background:white; padding:3px; margin-left:8px;"
                      onerror="this.style.display='none';">
@@ -522,6 +523,54 @@
                 
             } catch (error) {
                 alert('Error loading stats: ' + error.message);
+            }
+        }
+        
+        async function toggleBotStats() {
+            try {
+                const response = await fetch('/api/bot-stats');
+                const data = await response.json();
+                
+                let statsHTML = `
+                    <div style="background:#f8faf7; border:2px solid #8dc73f; border-radius:12px; padding:20px; margin-bottom:20px;">
+                        <h3 style="color:#014711; margin-bottom:15px;">📈 Bot Usage Analytics</h3>
+                        <div style="display:grid; grid-template-columns:repeat(4,1fr); gap:15px; margin-bottom:15px;">
+                            <div style="text-align:center; background:white; padding:15px; border-radius:10px;">
+                                <div style="font-size:2em; font-weight:700; color:#014711;">${data.total_bot_sessions || 0}</div>
+                                <div style="font-size:0.8em; color:#888;">Bot Sessions</div>
+                            </div>
+                            <div style="text-align:center; background:white; padding:15px; border-radius:10px;">
+                                <div style="font-size:2em; font-weight:700; color:#8dc73f;">${data.bot_resolved || 0}</div>
+                                <div style="font-size:0.8em; color:#888;">Resolved by Bot</div>
+                            </div>
+                            <div style="text-align:center; background:white; padding:15px; border-radius:10px;">
+                                <div style="font-size:2em; font-weight:700; color:#e74c3c;">${data.escalated || 0}</div>
+                                <div style="font-size:0.8em; color:#888;">Escalated</div>
+                            </div>
+                            <div style="text-align:center; background:white; padding:15px; border-radius:10px;">
+                                <div style="font-size:2em; font-weight:700; color:#1a5632;">${data.total_tickets || 0}</div>
+                                <div style="font-size:0.8em; color:#888;">Total Tickets</div>
+                            </div>
+                        </div>
+                        <hr style="margin:15px 0;">
+                        <h4 style="margin-bottom:10px;">✅ Staff Resolved by Bot (Did NOT Escalate):</h4>
+                        ${data.bot_users && data.bot_users.length > 0 ? 
+                            data.bot_users.map(u => `
+                                <div style="display:flex; justify-content:space-between; padding:8px 0; border-bottom:1px solid #e0e0e0;">
+                                    <span>👤 ${u.staff_name || 'Unknown'}</span>
+                                    <span>📧 ${u.staff_email}</span>
+                                    <strong>${u.chat_count} chats resolved</strong>
+                                </div>
+                            `).join('') 
+                            : '<p>No data yet - staff will appear here after getting bot help</p>'}
+                    </div>
+                `;
+                
+                document.getElementById('ticketsList').insertAdjacentHTML('beforebegin', statsHTML);
+                window.scrollTo(0, 0);
+                
+            } catch (error) {
+                alert('Error loading bot stats: ' + error.message);
             }
         }
         
