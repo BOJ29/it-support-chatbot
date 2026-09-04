@@ -418,6 +418,16 @@ def get_stats():
         print(f"Stats error: {e}")
         return jsonify({'error': str(e)}), 500
 
+@app.route('/monthly-stats')
+def monthly_stats():
+    """Monthly statistics page"""
+    return render_template('monthly_stats.html')
+
+@app.route('/bot-stats-page')
+def bot_stats_page():
+    """Bot analytics page"""
+    return render_template('bot_stats.html')
+
 # ============================================
 # EMAIL TEST
 # ============================================
@@ -444,6 +454,7 @@ def test_email():
             return "❌ Email failed. Check Render logs."
     except Exception as e:
         return f"❌ Error: {str(e)}"
+
 
 # ============================================
 # START THE SERVER

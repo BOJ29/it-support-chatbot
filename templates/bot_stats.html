@@ -1,0 +1,291 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bot Analytics - IT Support</title>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        :root {
+            --primary: #014711;
+            --secondary: #8dc73f;
+            --white: #ffffff;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: 'Montserrat', sans-serif;
+            background: linear-gradient(135deg, #f0f4f0 0%, #e8f0e8 50%, #f0f4f0 100%);
+            padding: 20px;
+            min-height: 100vh;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .page-header {
+            background: linear-gradient(135deg, #014711, #023d18);
+            color: white;
+            padding: 22px 28px;
+            border-radius: 20px;
+            margin-bottom: 25px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 15px;
+            box-shadow: 0 15px 50px rgba(1,71,17,0.3);
+        }
+
+        .page-header h1 { font-size: 1.5em; font-weight: 700; }
+
+        .back-btn {
+            background: rgba(255,255,255,0.15);
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 10px;
+            cursor: pointer;
+            font-family: 'Montserrat', sans-serif;
+            font-weight: 600;
+            font-size: 0.85em;
+            transition: all 0.3s;
+        }
+
+        .back-btn:hover {
+            background: #8dc73f;
+            color: #014711;
+        }
+
+        .stats-overview {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 15px;
+            margin-bottom: 25px;
+        }
+
+        .stat-card {
+            background: white;
+            border-radius: 16px;
+            padding: 20px;
+            text-align: center;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.06);
+            transition: all 0.3s;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 40px rgba(0,0,0,0.1);
+        }
+
+        .stat-card .number {
+            font-size: 2.5em;
+            font-weight: 800;
+            margin-bottom: 5px;
+        }
+
+        .stat-card .label {
+            font-size: 0.8em;
+            color: #888;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .chart-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            margin-bottom: 25px;
+        }
+
+        .chart-card {
+            background: white;
+            border-radius: 16px;
+            padding: 25px;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.06);
+        }
+
+        .chart-card h3 {
+            color: #014711;
+            margin-bottom: 20px;
+            font-size: 1.1em;
+        }
+
+        .table-card {
+            background: white;
+            border-radius: 16px;
+            padding: 25px;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.06);
+        }
+
+        .table-card h3 {
+            color: #014711;
+            margin-bottom: 20px;
+            font-size: 1.1em;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        th {
+            background: #014711;
+            color: white;
+            padding: 12px 15px;
+            text-align: left;
+            font-size: 0.85em;
+        }
+
+        td {
+            padding: 12px 15px;
+            border-bottom: 1px solid #e8f0e8;
+            font-size: 0.9em;
+            color: #333;
+        }
+
+        tr:hover td {
+            background: #f8faf7;
+        }
+
+        @media (max-width: 768px) {
+            .stats-overview { grid-template-columns: repeat(2, 1fr); }
+            .chart-grid { grid-template-columns: 1fr; }
+            .page-header { padding: 16px; }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="page-header">
+            <h1>📈 Bot Usage Analytics</h1>
+            <button class="back-btn" onclick="window.location.href='/admin/tickets'">← Back to Dashboard</button>
+        </div>
+
+        <div class="stats-overview" id="statsOverview">
+            <!-- Stats load here -->
+        </div>
+
+        <div class="chart-grid">
+            <div class="chart-card">
+                <h3>🤖 Bot Resolution Rate</h3>
+                <canvas id="resolutionChart"></canvas>
+            </div>
+            <div class="chart-card">
+                <h3>📊 Bot vs Escalation</h3>
+                <canvas id="comparisonChart"></canvas>
+            </div>
+        </div>
+
+        <div class="table-card">
+            <h3>✅ Staff Resolved by Bot (Did NOT Escalate)</h3>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Staff Name</th>
+                        <th>Email</th>
+                        <th>Chats Resolved</th>
+                        <th>Success Rate</th>
+                    </tr>
+                </thead>
+                <tbody id="botUsersTable">
+                    <!-- Data loads here -->
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <script>
+        async function loadBotStats() {
+            try {
+                const response = await fetch('/api/bot-stats');
+                const data = await response.json();
+                
+                const botResolved = data.bot_resolved || 0;
+                const escalated = data.escalated || 0;
+                const total = data.total_bot_sessions || 0;
+                const totalTickets = data.total_tickets || 0;
+                
+                document.getElementById('statsOverview').innerHTML = `
+                    <div class="stat-card">
+                        <div class="number" style="color:#014711;">${total}</div>
+                        <div class="label">Bot Sessions</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="number" style="color:#8dc73f;">${botResolved}</div>
+                        <div class="label">Resolved by Bot</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="number" style="color:#e74c3c;">${escalated}</div>
+                        <div class="label">Escalated</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="number" style="color:#1a5632;">${totalTickets}</div>
+                        <div class="label">Total Tickets</div>
+                    </div>
+                `;
+                
+                const resolutionRate = total > 0 ? Math.round((botResolved / total) * 100) : 0;
+                
+                new Chart(document.getElementById('resolutionChart'), {
+                    type: 'doughnut',
+                    data: {
+                        labels: ['Resolved by Bot', 'Escalated'],
+                        datasets: [{
+                            data: [botResolved, escalated],
+                            backgroundColor: ['#8dc73f', '#e74c3c'],
+                            borderWidth: 0
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        plugins: {
+                            legend: { position: 'bottom' },
+                            title: { display: true, text: `Bot Resolution Rate: ${resolutionRate}%` }
+                        }
+                    }
+                });
+                
+                new Chart(document.getElementById('comparisonChart'), {
+                    type: 'bar',
+                    data: {
+                        labels: ['Bot Resolved', 'Escalated', 'Total Tickets'],
+                        datasets: [{
+                            label: 'Count',
+                            data: [botResolved, escalated, totalTickets],
+                            backgroundColor: ['#8dc73f', '#e74c3c', '#014711'],
+                            borderRadius: 8
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        plugins: { legend: { display: false } },
+                        scales: { y: { beginAtZero: true } }
+                    }
+                });
+                
+                const botUsers = data.bot_users || [];
+                document.getElementById('botUsersTable').innerHTML = botUsers.length > 0 ? 
+                    botUsers.map(u => `
+                        <tr>
+                            <td><strong>${u.staff_name || 'Unknown'}</strong></td>
+                            <td>${u.staff_email}</td>
+                            <td>${u.chat_count}</td>
+                            <td>100%</td>
+                        </tr>
+                    `).join('')
+                    : '<tr><td colspan="4" style="text-align:center;">No data yet</td></tr>';
+                
+            } catch (error) {
+                console.error('Error:', error);
+            }
+        }
+        
+        loadBotStats();
+    </script>
+</body>
+</html>
