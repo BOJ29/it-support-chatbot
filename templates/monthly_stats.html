@@ -40,27 +40,67 @@
             flex-wrap: wrap;
             gap: 15px;
             box-shadow: 0 15px 50px rgba(1,71,17,0.3);
+            position: relative;
+            overflow: hidden;
         }
 
-        .page-header h1 { font-size: 1.5em; font-weight: 700; }
-        .page-header a {
-            color: #8dc73f;
-            text-decoration: none;
-            font-weight: 600;
-            font-size: 0.9em;
+        .page-header::before {
+            content: '';
+            position: absolute;
+            top: -60%;
+            right: -10%;
+            width: 250px;
+            height: 250px;
+            background: rgba(141, 199, 63, 0.15);
+            border-radius: 50%;
+        }
+
+        .page-header h1 {
+            font-size: 1.5em;
+            font-weight: 700;
+            position: relative;
+            z-index: 1;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .page-header h1 svg {
+            width: 26px;
+            height: 26px;
+            stroke: #8dc73f;
+            fill: none;
+            stroke-width: 2;
+            stroke-linecap: round;
+            stroke-linejoin: round;
         }
 
         .back-btn {
             background: rgba(255,255,255,0.15);
             color: white;
             border: none;
-            padding: 10px 20px;
+            padding: 11px 20px;
             border-radius: 10px;
             cursor: pointer;
             font-family: 'Montserrat', sans-serif;
             font-weight: 600;
             font-size: 0.85em;
             transition: all 0.3s;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            position: relative;
+            z-index: 1;
+        }
+
+        .back-btn svg {
+            width: 16px;
+            height: 16px;
+            stroke: currentColor;
+            fill: none;
+            stroke-width: 2;
+            stroke-linecap: round;
+            stroke-linejoin: round;
         }
 
         .back-btn:hover {
@@ -89,8 +129,27 @@
             box-shadow: 0 15px 40px rgba(0,0,0,0.1);
         }
 
+        .stat-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 10px;
+        }
+
+        .stat-icon svg {
+            width: 20px;
+            height: 20px;
+            stroke-width: 2;
+            stroke-linecap: round;
+            stroke-linejoin: round;
+            fill: none;
+        }
+
         .stat-card .number {
-            font-size: 2.5em;
+            font-size: 2.2em;
             font-weight: 800;
             margin-bottom: 5px;
         }
@@ -120,6 +179,19 @@
             color: #014711;
             margin-bottom: 20px;
             font-size: 1.1em;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .chart-card h3 svg {
+            width: 18px;
+            height: 18px;
+            stroke: #014711;
+            fill: none;
+            stroke-width: 2;
+            stroke-linecap: round;
+            stroke-linejoin: round;
         }
 
         .chart-card canvas {
@@ -131,13 +203,25 @@
             border-radius: 16px;
             padding: 25px;
             box-shadow: 0 5px 20px rgba(0,0,0,0.06);
-            margin-bottom: 25px;
         }
 
         .table-card h3 {
             color: #014711;
             margin-bottom: 20px;
             font-size: 1.1em;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .table-card h3 svg {
+            width: 18px;
+            height: 18px;
+            stroke: #014711;
+            fill: none;
+            stroke-width: 2;
+            stroke-linecap: round;
+            stroke-linejoin: round;
         }
 
         table {
@@ -174,51 +258,65 @@
 <body>
     <div class="container">
         <div class="page-header">
-            <h1>📊 Monthly Statistics</h1>
-            <button class="back-btn" onclick="window.location.href='/admin/tickets'">← Back to Dashboard</button>
+            <h1>
+                <svg viewBox="0 0 24 24"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>
+                Monthly Statistics
+            </h1>
+            <button class="back-btn" onclick="window.location.href='/admin/tickets'">
+                <svg viewBox="0 0 24 24"><line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/></svg>
+                Back to Dashboard
+            </button>
         </div>
 
-        <div class="stats-overview" id="statsOverview">
-            <!-- Stats load here -->
-        </div>
+        <div class="stats-overview" id="statsOverview"></div>
 
         <div class="chart-grid">
             <div class="chart-card">
-                <h3>🎫 Ticket Status Distribution</h3>
+                <h3>
+                    <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+                    Ticket Status Distribution
+                </h3>
                 <canvas id="statusChart"></canvas>
             </div>
             <div class="chart-card">
-                <h3>📂 Issues by Category</h3>
+                <h3>
+                    <svg viewBox="0 0 24 24"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/></svg>
+                    Issues by Category
+                </h3>
                 <canvas id="categoryChart"></canvas>
             </div>
         </div>
 
         <div class="chart-grid">
             <div class="chart-card">
-                <h3>⚡ Priority Distribution</h3>
+                <h3>
+                    <svg viewBox="0 0 24 24"><path d="M12 2l3 7h6l-5 4 2 7-6-4-6 4 2-7-5-4h6z"/></svg>
+                    Priority Distribution
+                </h3>
                 <canvas id="priorityChart"></canvas>
             </div>
             <div class="chart-card">
-                <h3>📅 Weekly Ticket Trend</h3>
+                <h3>
+                    <svg viewBox="0 0 24 24"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
+                    Weekly Ticket Trend
+                </h3>
                 <canvas id="trendChart"></canvas>
             </div>
         </div>
 
         <div class="table-card">
-            <h3>📋 Category Breakdown</h3>
+            <h3>
+                <svg viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"/><line x1="3" y1="9" x2="21" y2="9"/><line x1="9" y1="21" x2="9" y2="9"/></svg>
+                Category Breakdown
+            </h3>
             <table>
                 <thead>
                     <tr>
                         <th>Category</th>
                         <th>Total Tickets</th>
-                        <th>Open</th>
-                        <th>Resolved</th>
-                        <th>Resolution Rate</th>
                     </tr>
                 </thead>
-                <tbody id="categoryTable">
-                    <!-- Data loads here -->
-                </tbody>
+                <tbody id="categoryTable"></tbody>
             </table>
         </div>
     </div>
@@ -232,27 +330,37 @@
                 const ms = data.month_stats || {};
                 const categories = data.categories || [];
                 
-                // Overview
                 document.getElementById('statsOverview').innerHTML = `
                     <div class="stat-card">
+                        <div class="stat-icon" style="background:#e8f5e9;">
+                            <svg viewBox="0 0 24 24" style="stroke:#014711;"><rect x="3" y="3" width="18" height="18" rx="2"/><line x1="3" y1="9" x2="21" y2="9"/></svg>
+                        </div>
                         <div class="number" style="color:#014711;">${ms.total_tickets || 0}</div>
                         <div class="label">Total Tickets</div>
                     </div>
                     <div class="stat-card">
-                        <div class="number" style="color:#8dc73f;">${ms.open_tickets || 0}</div>
+                        <div class="stat-icon" style="background:#fff3cd;">
+                            <svg viewBox="0 0 24 24" style="stroke:#856404;"><circle cx="12" cy="12" r="10"/></svg>
+                        </div>
+                        <div class="number" style="color:#856404;">${ms.open_tickets || 0}</div>
                         <div class="label">Open</div>
                     </div>
                     <div class="stat-card">
+                        <div class="stat-icon" style="background:#e8f5e9;">
+                            <svg viewBox="0 0 24 24" style="stroke:#1a5632;"><path d="M20 6L9 17l-5-5"/></svg>
+                        </div>
                         <div class="number" style="color:#1a5632;">${ms.resolved_tickets || 0}</div>
                         <div class="label">Resolved</div>
                     </div>
                     <div class="stat-card">
+                        <div class="stat-icon" style="background:#ffe5e5;">
+                            <svg viewBox="0 0 24 24" style="stroke:#e74c3c;"><path d="M12 2l3 7h6l-5 4 2 7-6-4-6 4 2-7-5-4h6z"/></svg>
+                        </div>
                         <div class="number" style="color:#e74c3c;">${ms.high_priority || 0}</div>
                         <div class="label">High Priority</div>
                     </div>
                 `;
                 
-                // Status Chart
                 new Chart(document.getElementById('statusChart'), {
                     type: 'doughnut',
                     data: {
@@ -263,13 +371,9 @@
                             borderWidth: 0
                         }]
                     },
-                    options: {
-                        responsive: true,
-                        plugins: { legend: { position: 'bottom' } }
-                    }
+                    options: { responsive: true, plugins: { legend: { position: 'bottom' } } }
                 });
                 
-                // Category Chart
                 new Chart(document.getElementById('categoryChart'), {
                     type: 'bar',
                     data: {
@@ -288,7 +392,6 @@
                     }
                 });
                 
-                // Priority Chart
                 new Chart(document.getElementById('priorityChart'), {
                     type: 'pie',
                     data: {
@@ -299,13 +402,9 @@
                             borderWidth: 0
                         }]
                     },
-                    options: {
-                        responsive: true,
-                        plugins: { legend: { position: 'bottom' } }
-                    }
+                    options: { responsive: true, plugins: { legend: { position: 'bottom' } } }
                 });
                 
-                // Trend Chart (placeholder)
                 new Chart(document.getElementById('trendChart'), {
                     type: 'line',
                     data: {
@@ -326,14 +425,10 @@
                     }
                 });
                 
-                // Category Table
                 document.getElementById('categoryTable').innerHTML = categories.map(c => `
                     <tr>
                         <td><strong>${c.category}</strong></td>
                         <td>${c.count}</td>
-                        <td>-</td>
-                        <td>-</td>
-                        <td>-</td>
                     </tr>
                 `).join('');
                 
