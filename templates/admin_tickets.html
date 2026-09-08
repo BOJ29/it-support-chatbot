@@ -58,7 +58,26 @@
             border-radius: 50%;
         }
         
-        .header h1 { font-size: 1.5em; font-weight: 700; position: relative; z-index: 1; }
+        .header h1 { 
+            font-size: 1.5em; 
+            font-weight: 700; 
+            position: relative; 
+            z-index: 1;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .header h1 svg {
+            width: 26px;
+            height: 26px;
+            stroke: #8dc73f;
+            fill: none;
+            stroke-width: 2;
+            stroke-linecap: round;
+            stroke-linejoin: round;
+        }
+        
         .header p { opacity: 0.85; font-size: 0.8em; margin-top: 4px; position: relative; z-index: 1; }
         
         .header-stats {
@@ -96,48 +115,25 @@
             transition: all 0.3s;
             white-space: nowrap;
             box-shadow: 0 4px 15px rgba(141, 199, 63, 0.4);
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+        }
+        
+        .refresh-btn svg, .export-btn svg {
+            width: 16px;
+            height: 16px;
+            stroke: #014711;
+            fill: none;
+            stroke-width: 2;
+            stroke-linecap: round;
+            stroke-linejoin: round;
         }
         
         .refresh-btn:hover, .export-btn:hover {
             transform: translateY(-3px);
             box-shadow: 0 8px 25px rgba(141, 199, 63, 0.5);
         }
-        
-        .stats-panel {
-            display: none;
-            background: white;
-            border: 2px solid #8dc73f;
-            border-radius: 16px;
-            padding: 25px;
-            margin-bottom: 20px;
-            box-shadow: 0 10px 40px rgba(0,0,0,0.08);
-            animation: slideDown 0.4s ease-out;
-        }
-        
-        @keyframes slideDown {
-            from { opacity: 0; transform: translateY(-20px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-        
-        .stats-panel.show { display: block; }
-        
-        .stats-grid {
-            display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            gap: 15px;
-            margin-bottom: 15px;
-        }
-        
-        .stat-card {
-            text-align: center;
-            background: linear-gradient(135deg, #f8faf7, #f0f4f0);
-            padding: 20px;
-            border-radius: 14px;
-            box-shadow: var(--shadow-sm);
-        }
-        
-        .stat-card .number { font-size: 2.2em; font-weight: 700; color: #014711; }
-        .stat-card .label { font-size: 0.8em; color: #888; margin-top: 5px; }
         
         .ticket-card {
             background: white;
@@ -172,7 +168,24 @@
             gap: 8px;
         }
         
-        .ticket-id { font-size: 1.2em; font-weight: 700; color: #014711; }
+        .ticket-id { 
+            font-size: 1.2em; 
+            font-weight: 700; 
+            color: #014711;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+        
+        .ticket-id svg {
+            width: 18px;
+            height: 18px;
+            stroke: #014711;
+            fill: none;
+            stroke-width: 2;
+            stroke-linecap: round;
+            stroke-linejoin: round;
+        }
         
         .badge-group { display: flex; gap: 8px; flex-wrap: wrap; }
         
@@ -196,6 +209,9 @@
             font-size: 0.75em;
             font-weight: 600;
             white-space: nowrap;
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
         }
         
         .status-resolved {
@@ -206,6 +222,9 @@
             font-size: 0.75em;
             font-weight: 600;
             white-space: nowrap;
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
         }
         
         .ticket-issue { color: #555; line-height: 1.6; margin: 10px 0; font-size: 0.9em; }
@@ -217,6 +236,20 @@
             margin: 10px 0;
             font-size: 0.85em;
             color: #333;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            flex-wrap: wrap;
+        }
+        
+        .ticket-user svg {
+            width: 16px;
+            height: 16px;
+            stroke: #014711;
+            fill: none;
+            stroke-width: 2;
+            stroke-linecap: round;
+            stroke-linejoin: round;
         }
         
         .ticket-footer {
@@ -242,6 +275,18 @@
             font-size: 0.82em;
             transition: all 0.3s;
             white-space: nowrap;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+        }
+        
+        .resolve-btn svg, .chat-btn svg {
+            width: 16px;
+            height: 16px;
+            fill: none;
+            stroke-width: 2;
+            stroke-linecap: round;
+            stroke-linejoin: round;
         }
         
         .resolve-btn {
@@ -250,11 +295,15 @@
             box-shadow: 0 4px 12px rgba(141, 199, 63, 0.4);
         }
         
+        .resolve-btn svg { stroke: #014711; }
+        
         .chat-btn {
             background: linear-gradient(135deg, #014711, #023d18);
             color: white;
             box-shadow: 0 4px 12px rgba(1, 71, 17, 0.3);
         }
+        
+        .chat-btn svg { stroke: white; }
         
         .resolve-btn:hover, .chat-btn:hover {
             transform: translateY(-2px);
@@ -269,7 +318,19 @@
             font-size: 0.82em;
             font-weight: 700;
             white-space: nowrap;
-            display: inline-block;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+        }
+        
+        .resolved-badge svg {
+            width: 16px;
+            height: 16px;
+            stroke: white;
+            fill: none;
+            stroke-width: 2;
+            stroke-linecap: round;
+            stroke-linejoin: round;
         }
         
         .chat-modal {
@@ -354,6 +415,19 @@
             font-family: 'Montserrat', sans-serif;
             transition: all 0.3s;
             box-shadow: 0 4px 12px rgba(141, 199, 63, 0.4);
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+        }
+        
+        .chat-modal-input button svg {
+            width: 16px;
+            height: 16px;
+            stroke: #014711;
+            fill: none;
+            stroke-width: 2;
+            stroke-linecap: round;
+            stroke-linejoin: round;
         }
         
         .chat-modal-input button:hover {
@@ -374,7 +448,6 @@
             .stat-number { font-size: 1.3em; }
             .ticket-card { padding: 16px 18px; }
             .ticket-id { font-size: 1em; }
-            .stats-grid { grid-template-columns: 1fr; }
             .chat-modal-box { height: 90%; }
         }
     </style>
@@ -383,7 +456,10 @@
     <div class="container">
         <div class="header">
             <div>
-                <h1>🎫 Support Tickets</h1>
+                <h1>
+                    <svg viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5"/></svg>
+                    Support Tickets
+                </h1>
                 <p>Real-time ticket management</p>
             </div>
             <div class="header-stats">
@@ -395,20 +471,26 @@
                     <div class="stat-number" id="totalCount">0</div>
                     <div class="stat-label">Total</div>
                 </div>
-                <button class="refresh-btn" onclick="loadTickets()">🔄 Refresh</button>
-                <button class="export-btn" onclick="exportCSV()">📥 Export CSV</button>
-                <button class="export-btn" onclick="window.location.href='/monthly-stats'">📊 Statistics</button>
-                <button class="export-btn" onclick="window.location.href='/bot-stats-page'">📈 Bot Stats</button>
+                <button class="refresh-btn" onclick="loadTickets()">
+                    <svg viewBox="0 0 24 24"><polyline points="23 4 23 10 17 10"/><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/></svg>
+                    Refresh
+                </button>
+                <button class="export-btn" onclick="exportCSV()">
+                    <svg viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+                    Export CSV
+                </button>
+                <button class="export-btn" onclick="window.location.href='/monthly-stats'">
+                    <svg viewBox="0 0 24 24"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>
+                    Statistics
+                </button>
+                <button class="export-btn" onclick="window.location.href='/bot-stats-page'">
+                    <svg viewBox="0 0 24 24"><path d="M12 20V10"/><path d="M18 20V4"/><path d="M6 20v-4"/></svg>
+                    Bot Stats
+                </button>
                 <img src="/static/Agmas LinkedIn Carousel.png" alt="Company Logo" 
                      style="width:45px; height:45px; border-radius:12px; object-fit:contain; background:white; padding:4px; margin-left:8px; box-shadow:0 4px 12px rgba(0,0,0,0.2);"
                      onerror="this.style.display='none';">
             </div>
-        </div>
-        
-        <div class="stats-panel" id="statsPanel">
-            <h3 style="color:#014711; margin-bottom:15px;">📊 Monthly Statistics</h3>
-            <div class="stats-grid" id="statsGrid"></div>
-            <div id="categoryBreakdown"></div>
         </div>
         
         <div id="ticketsList">
@@ -419,19 +501,27 @@
     <div class="chat-modal" id="chatModal">
         <div class="chat-modal-box">
             <div class="chat-modal-header">
-                <h3 style="flex:1;">💬 Ticket Chat <span id="chatTicketId"></span></h3>
+                <h3 style="flex:1; display:flex; align-items:center; gap:8px;">
+                    <svg viewBox="0 0 24 24" style="width:18px;height:18px;stroke:white;fill:none;stroke-width:2;"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+                    Ticket Chat <span id="chatTicketId"></span>
+                </h3>
                 <div style="display:flex; align-items:center; gap:5px; font-size:0.7em; color:#8dc73f; margin-right:15px;">
                     <span style="width:8px; height:8px; background:#8dc73f; border-radius:50%; animation:pulse 2s infinite; display:inline-block;"></span>
                     Live
                 </div>
-                <button onclick="closeChat()" style="background:none; border:none; color:white; font-size:1.5em; cursor:pointer;">&times;</button>
+                <button onclick="closeChat()" style="background:none; border:none; color:white; font-size:1.5em; cursor:pointer;">
+                    <svg viewBox="0 0 24 24" style="width:20px;height:20px;stroke:white;fill:none;stroke-width:2;stroke-linecap:round;"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+                </button>
             </div>
             <div class="chat-modal-body" id="chatMessages">
                 <p style="color:#888; text-align:center;">No messages yet. Start the conversation!</p>
             </div>
             <div class="chat-modal-input">
                 <input type="text" id="chatInput" placeholder="Type your reply...">
-                <button onclick="sendChatMessage()">Send</button>
+                <button onclick="sendChatMessage()">
+                    <svg viewBox="0 0 24 24"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
+                    Send
+                </button>
             </div>
         </div>
     </div>
@@ -450,19 +540,25 @@
                 
                 if (tickets.length === 0) {
                     document.getElementById('ticketsList').innerHTML = 
-                        '<div class="no-tickets">✅ All clear! No pending tickets.</div>';
+                        '<div class="no-tickets">All clear! No pending tickets.</div>';
                     return;
                 }
                 
                 document.getElementById('ticketsList').innerHTML = tickets.map(ticket => `
                     <div class="ticket-card priority-${ticket.priority ? ticket.priority.toLowerCase() : 'medium'}">
                         <div class="ticket-header">
-                            <span class="ticket-id">#${ticket.id}</span>
+                            <span class="ticket-id">
+                                <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+                                #${ticket.id}
+                            </span>
                             <div class="badge-group">
                                 <span class="priority-badge priority-${ticket.priority ? ticket.priority.toLowerCase() : 'medium'}">
                                     ${ticket.priority || 'Medium'}
                                 </span>
                                 <span class="${ticket.status === 'Open' ? 'status-open' : 'status-resolved'}">
+                                    ${ticket.status === 'Open' ? 
+                                        '<svg viewBox="0 0 24 24" style="width:12px;height:12px;stroke:currentColor;fill:none;stroke-width:2;"><circle cx="12" cy="12" r="10"/></svg>' : 
+                                        '<svg viewBox="0 0 24 24" style="width:12px;height:12px;stroke:currentColor;fill:none;stroke-width:2;"><path d="M20 6L9 17l-5-5"/></svg>'}
                                     ${ticket.status || 'Open'}
                                 </span>
                             </div>
@@ -471,16 +567,27 @@
                             <strong>Issue:</strong> ${ticket.issue_description || 'N/A'}
                         </div>
                         <div class="ticket-user">
-                            <strong>👤 Staff:</strong> ${ticket.staff_name || 'Unknown'} 
-                            <strong>📧 Email:</strong> ${ticket.staff_email || ticket.user_id || 'N/A'}
+                            <svg viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+                            <span><strong>Staff:</strong> ${ticket.staff_name || 'Unknown'}</span>
+                            <svg viewBox="0 0 24 24"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
+                            <span><strong>Email:</strong> ${ticket.staff_email || ticket.user_id || 'N/A'}</span>
                         </div>
                         <div class="ticket-footer">
-                            <span>📅 ${new Date(ticket.created_date).toLocaleString()}</span>
+                            <span>${new Date(ticket.created_date).toLocaleString()}</span>
                             <div style="display:flex; gap:8px;">
-                                <button class="chat-btn" onclick="openChat(${ticket.id})">💬 Chat</button>
+                                <button class="chat-btn" onclick="openChat(${ticket.id})">
+                                    <svg viewBox="0 0 24 24"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+                                    Chat
+                                </button>
                                 ${ticket.status === 'Open' ? 
-                                    `<button class="resolve-btn" onclick="resolveTicket(${ticket.id})">✅ Resolve</button>` 
-                                    : `<span class="resolved-badge">✅ Resolved</span>`}
+                                    `<button class="resolve-btn" onclick="resolveTicket(${ticket.id})">
+                                        <svg viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5"/></svg>
+                                        Resolve
+                                    </button>` 
+                                    : `<span class="resolved-badge">
+                                        <svg viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5"/></svg>
+                                        Resolved
+                                    </span>`}
                             </div>
                         </div>
                     </div>
@@ -488,7 +595,7 @@
                 
             } catch (error) {
                 document.getElementById('ticketsList').innerHTML = 
-                    '<div class="no-tickets">❌ Error loading tickets</div>';
+                    '<div class="no-tickets">Error loading tickets</div>';
                 console.error('Error:', error);
             }
         }
@@ -508,106 +615,6 @@
         
         function exportCSV() {
             window.open('/api/export-tickets', '_blank');
-        }
-        
-        async function toggleStats() {
-            const panel = document.getElementById('statsPanel');
-            
-            if (panel.classList.contains('show')) {
-                panel.classList.remove('show');
-                return;
-            }
-            
-            try {
-                const response = await fetch('/api/stats');
-                const data = await response.json();
-                
-                const ms = data.month_stats || {};
-                const categories = data.categories || [];
-                
-                document.getElementById('statsGrid').innerHTML = `
-                    <div class="stat-card">
-                        <div class="number">${ms.total_tickets || 0}</div>
-                        <div class="label">Total Tickets</div>
-                    </div>
-                    <div class="stat-card">
-                        <div class="number" style="color:#8dc73f;">${ms.open_tickets || 0}</div>
-                        <div class="label">Open</div>
-                    </div>
-                    <div class="stat-card">
-                        <div class="number" style="color:#1a5632;">${ms.resolved_tickets || 0}</div>
-                        <div class="label">Resolved</div>
-                    </div>
-                `;
-                
-                let categoryHTML = '<h4 style="margin-bottom:10px;">Category Breakdown:</h4>';
-                if (categories.length > 0) {
-                    categories.forEach(c => {
-                        categoryHTML += `
-                            <div style="display:flex; justify-content:space-between; padding:5px 0; border-bottom:1px solid #e0e0e0;">
-                                <span>${c.category}</span>
-                                <strong>${c.count}</strong>
-                            </div>
-                        `;
-                    });
-                } else {
-                    categoryHTML += '<p>No data this month</p>';
-                }
-                
-                document.getElementById('categoryBreakdown').innerHTML = categoryHTML;
-                panel.classList.add('show');
-                
-            } catch (error) {
-                alert('Error loading stats: ' + error.message);
-            }
-        }
-        
-        async function toggleBotStats() {
-            try {
-                const response = await fetch('/api/bot-stats');
-                const data = await response.json();
-                
-                let statsHTML = `
-                    <div style="background:white; border:2px solid #8dc73f; border-radius:16px; padding:25px; margin-bottom:20px; box-shadow:0 10px 40px rgba(0,0,0,0.08);">
-                        <h3 style="color:#014711; margin-bottom:15px;">📈 Bot Usage Analytics</h3>
-                        <div style="display:grid; grid-template-columns:repeat(4,1fr); gap:15px; margin-bottom:15px;">
-                            <div style="text-align:center; background:linear-gradient(135deg,#f8faf7,#f0f4f0); padding:18px; border-radius:12px;">
-                                <div style="font-size:2em; font-weight:700; color:#014711;">${data.total_bot_sessions || 0}</div>
-                                <div style="font-size:0.8em; color:#888;">Bot Sessions</div>
-                            </div>
-                            <div style="text-align:center; background:linear-gradient(135deg,#f8faf7,#f0f4f0); padding:18px; border-radius:12px;">
-                                <div style="font-size:2em; font-weight:700; color:#8dc73f;">${data.bot_resolved || 0}</div>
-                                <div style="font-size:0.8em; color:#888;">Resolved by Bot</div>
-                            </div>
-                            <div style="text-align:center; background:linear-gradient(135deg,#f8faf7,#f0f4f0); padding:18px; border-radius:12px;">
-                                <div style="font-size:2em; font-weight:700; color:#e74c3c;">${data.escalated || 0}</div>
-                                <div style="font-size:0.8em; color:#888;">Escalated</div>
-                            </div>
-                            <div style="text-align:center; background:linear-gradient(135deg,#f8faf7,#f0f4f0); padding:18px; border-radius:12px;">
-                                <div style="font-size:2em; font-weight:700; color:#1a5632;">${data.total_tickets || 0}</div>
-                                <div style="font-size:0.8em; color:#888;">Total Tickets</div>
-                            </div>
-                        </div>
-                        <hr style="margin:15px 0;">
-                        <h4 style="margin-bottom:10px;">✅ Staff Resolved by Bot (Did NOT Escalate):</h4>
-                        ${data.bot_users && data.bot_users.length > 0 ? 
-                            data.bot_users.map(u => `
-                                <div style="display:flex; justify-content:space-between; padding:8px 0; border-bottom:1px solid #e0e0e0;">
-                                    <span>👤 ${u.staff_name || 'Unknown'}</span>
-                                    <span>📧 ${u.staff_email}</span>
-                                    <strong>${u.chat_count} chats resolved</strong>
-                                </div>
-                            `).join('') 
-                            : '<p>No data yet - staff will appear here after getting bot help</p>'}
-                    </div>
-                `;
-                
-                document.getElementById('ticketsList').insertAdjacentHTML('beforebegin', statsHTML);
-                window.scrollTo(0, 0);
-                
-            } catch (error) {
-                alert('Error loading bot stats: ' + error.message);
-            }
         }
         
         function openChat(ticketId) {
@@ -651,7 +658,7 @@
                     return `
                         <div style="margin:10px 0; text-align:${isIT ? 'right' : 'left'};">
                             <div style="display:inline-block; padding:10px 15px; border-radius:15px; 
-                                        background:${isIT ? 'linear-gradient(135deg,#014711,#023d18)' : '#e8f5e9'}; 
+                                        background:${isIT ? '#014711' : '#e8f5e9'}; 
                                         color:${isIT ? 'white' : '#333'};
                                         max-width:80%;">
                                 <strong style="font-size:0.7em;">${msg.sender}</strong><br>
