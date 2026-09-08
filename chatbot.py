@@ -46,11 +46,9 @@ class ITSupportChatbot:
         session = self.user_sessions[user_id]
         message_lower = message.lower().strip()
         
-        # Check if user wants to see IT support messages
         if 'check messages' in message_lower or 'it support said' in message_lower or 'reply from it' in message_lower or 'any update' in message_lower:
             return self._check_support_messages(user_id, session)
         
-        # Check if user is replying to IT support
         if session.get('awaiting_reply') and session.get('ticket_id'):
             return self._send_reply_to_it(user_id, message, session)
         
@@ -120,15 +118,15 @@ class ITSupportChatbot:
             
             if not messages:
                 return {
-                    'message': "📭 No messages from IT support yet.\n\nThey'll reply here soon. Type 'check messages' anytime to see updates.",
+                    'message': "No messages from IT support yet.\n\nThey'll reply here soon. Type 'check messages' anytime to see updates.",
                     'type': 'clarification'
                 }
             
-            message_text = "💬 Messages from IT Support:\n\n"
+            message_text = "Messages from IT Support:\n\n"
             for msg in messages:
-                message_text += f"**{msg['sender']}:** {msg['message']}\n\n"
+                message_text += f"[{msg['sender']}]: {msg['message']}\n\n"
             
-            message_text += "━━━━━━━━━━━━━━━━\n"
+            message_text += "--------------------\n"
             message_text += "Type your reply below and it will be sent to IT support."
             
             session['awaiting_reply'] = True
@@ -167,14 +165,14 @@ class ITSupportChatbot:
             session['ticket_id'] = None
             
             return {
-                'message': "✅ Your reply has been sent to IT support!\n\nThey'll respond here. Type 'check messages' to see updates.",
+                'message': "Your reply has been sent to IT support!\n\nThey'll respond here. Type 'check messages' to see updates.",
                 'type': 'reply_sent'
             }
             
         except Exception as e:
             print(f"Error sending reply: {e}")
             return {
-                'message': "❌ Failed to send reply. Please try again.",
+                'message': "Failed to send reply. Please try again.",
                 'type': 'clarification'
             }
     
@@ -189,7 +187,7 @@ class ITSupportChatbot:
             session['awaiting_feedback'] = False
             session['attempts'] = 0
             return {
-                'message': "Great! I'm glad that helped! 😊\n\nIs there anything else I can assist you with?",
+                'message': "Great! I'm glad that helped!\n\nIs there anything else I can assist you with?",
                 'type': 'feedback_positive'
             }
         elif any(word in message for word in negative_words) or 'escalate' in message:
@@ -197,7 +195,7 @@ class ITSupportChatbot:
             return self._escalate_issue(user_id, session)
         else:
             return {
-                'message': "I didn't quite catch that. Did the solution work?\n\n• Type 'yes' if it worked\n• Type 'escalate' if you still need help",
+                'message': "I didn't quite catch that. Did the solution work?\n\nType 'yes' if it worked\nType 'escalate' if you still need help",
                 'type': 'clarification'
             }
     
@@ -211,20 +209,20 @@ class ITSupportChatbot:
     
     def _handle_greeting(self):
         response = (
-            "👋 Hello! I'm your IT Support Assistant.\n\n"
+            "Hello! I'm your IT Support Assistant.\n\n"
             "I can help with:\n"
-            "• Network Issues\n"
-            "• Printer Problems\n"
-            "• System Freezing\n"
-            "• Software Installation\n\n"
+            "Network Issues\n"
+            "Printer Problems\n"
+            "System Freezing\n"
+            "Software Installation\n\n"
             "Just describe your problem and I'll guide you!\n"
             "For example: 'My printer is not working'\n\n"
-            "💡 Type 'check messages' to see IT support replies."
+            "Type 'check messages' to see IT support replies."
         )
         return {'message': response, 'type': 'greeting'}
     
     def _handle_farewell(self):
-        response = "You're welcome! 😊 Type 'help' anytime you need assistance."
+        response = "You're welcome! Type 'help' anytime you need assistance."
         return {'message': response, 'type': 'farewell'}
     
     def _detect_category(self, text):
@@ -248,25 +246,25 @@ class ITSupportChatbot:
         solution = ai_result['solution']
         confidence = ai_result['confidence']
         response = (
-            f"🎯 Here's what I recommend:\n\n"
+            f"Here's what I recommend:\n\n"
             f"{solution['solution']}\n\n"
-            f"📊 Difficulty: {solution['difficulty']}\n"
-            f"📂 Category: {solution['category']}\n\n"
+            f"Difficulty: {solution['difficulty']}\n"
+            f"Category: {solution['category']}\n\n"
             f"Did this solve your problem?\n"
-            f"• Type 'yes' if it worked\n"
-            f"• Type 'escalate' if you still need help"
+            f"Type 'yes' if it worked\n"
+            f"Type 'escalate' if you still need help"
         )
         return {'message': response, 'type': 'solution', 'solution': solution, 'confidence': confidence}
     
     def _format_kb_response(self, solution):
         response = (
-            f"💡 I found this solution:\n\n"
+            f"I found this solution:\n\n"
             f"{solution['solution']}\n\n"
-            f"📊 Difficulty: {solution['difficulty']}\n"
-            f"📂 Category: {solution['category']}\n\n"
+            f"Difficulty: {solution['difficulty']}\n"
+            f"Category: {solution['category']}\n\n"
             f"Did this solve your problem?\n"
-            f"• Type 'yes' if it worked\n"
-            f"• Type 'escalate' if you still need help"
+            f"Type 'yes' if it worked\n"
+            f"Type 'escalate' if you still need help"
         )
         return {'message': response, 'type': 'solution', 'solution': solution, 'confidence': 75}
     
@@ -275,18 +273,18 @@ class ITSupportChatbot:
         if attempts == 1:
             response = (
                 "I need more details to help better. Can you tell me:\n\n"
-                "• What exactly is happening?\n"
-                "• When did it start?\n"
-                "• Any error messages?\n\n"
+                "What exactly is happening?\n"
+                "When did it start?\n"
+                "Any error messages?\n\n"
                 "The more details, the better I can help!"
             )
         else:
             response = (
                 "I'm still having trouble finding the right solution.\n\n"
                 "Try:\n"
-                "• Describing the problem differently\n"
-                "• Mentioning specific error codes\n"
-                "• Or type 'escalate' to contact IT staff directly"
+                "Describing the problem differently\n"
+                "Mentioning specific error codes\n"
+                "Or type 'escalate' to contact IT staff directly"
             )
         return {'message': response, 'type': 'clarification'}
     
@@ -311,7 +309,7 @@ class ITSupportChatbot:
                         target=self.email.send_email,
                         args=(
                             "agmasiltd@gmail.com",
-                            f"🔧 Ticket #{ticket_id} - {priority} Priority",
+                            f"Ticket #{ticket_id} - {priority} Priority",
                             f"Ticket ID: #{ticket_id}\nPriority: {priority}\n"
                             f"Issue: {last_issue}\nStaff: {staff_name}\nEmail: {staff_email}"
                         ),
@@ -334,12 +332,12 @@ class ITSupportChatbot:
             
             return {
                 'message': (
-                    f"🚨 SUPPORT TICKET CREATED!\n\n"
-                    f"🎫 Ticket ID: #{ticket_id}\n"
-                    f"⚡ Priority: {priority}\n"
-                    f"📋 Status: Open\n\n"
+                    f"SUPPORT TICKET CREATED!\n\n"
+                    f"Ticket ID: #{ticket_id}\n"
+                    f"Priority: {priority}\n"
+                    f"Status: Open\n\n"
                     f"An IT staff member will address this shortly.\n\n"
-                    f"💡 Type 'check messages' to see IT support replies."
+                    f"Type 'check messages' to see IT support replies."
                 ),
                 'type': 'escalation',
                 'ticket_id': ticket_id,
@@ -360,7 +358,7 @@ class ITSupportChatbot:
             }
             return {
                 'message': (
-                    f"⚠️ I've noted your issue. The IT team will be notified.\n\n"
+                    f"I've noted your issue. The IT team will be notified.\n\n"
                     f"Is there anything else I can help with?"
                 ),
                 'type': 'escalation',
