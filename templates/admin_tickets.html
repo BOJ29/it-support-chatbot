@@ -7,13 +7,13 @@
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <style>
         :root {
-            --primary: #014711;
-            --secondary: #8dc73f;
+            --primary: #6C3CE1;
+            --secondary: #A78BFA;
             --white: #ffffff;
-            --light-bg: #f8faf7;
-            --dark-text: #1a2e1a;
+            --light-bg: #f5f3ff;
+            --dark-text: #1e1b2e;
             --gray-text: #666;
-            --shadow: 0 10px 40px rgba(1, 71, 17, 0.2);
+            --shadow: 0 10px 40px rgba(108, 60, 225, 0.25);
             --shadow-sm: 0 4px 15px rgba(0,0,0,0.06);
         }
 
@@ -21,7 +21,7 @@
         
         body {
             font-family: 'Montserrat', sans-serif;
-            background: linear-gradient(135deg, #f0f4f0 0%, #e8f0e8 50%, #f0f4f0 100%);
+            background: linear-gradient(135deg, #f5f3ff 0%, #ede9fe 50%, #f5f3ff 100%);
             padding: 20px;
             min-height: 100vh;
         }
@@ -32,7 +32,7 @@
         }
         
         .header {
-            background: linear-gradient(135deg, #014711, #023d18);
+            background: linear-gradient(135deg, #6C3CE1, #8B5CF6);
             color: white;
             padding: 22px 28px;
             border-radius: 20px;
@@ -42,7 +42,7 @@
             align-items: center;
             flex-wrap: wrap;
             gap: 15px;
-            box-shadow: 0 15px 50px rgba(1,71,17,0.3);
+            box-shadow: 0 15px 50px rgba(108,60,225,0.3);
             position: relative;
             overflow: hidden;
         }
@@ -54,7 +54,7 @@
             right: -10%;
             width: 250px;
             height: 250px;
-            background: rgba(141, 199, 63, 0.15);
+            background: rgba(167, 139, 250, 0.2);
             border-radius: 50%;
         }
         
@@ -71,7 +71,7 @@
         .header h1 svg {
             width: 26px;
             height: 26px;
-            stroke: #8dc73f;
+            stroke: #A78BFA;
             fill: none;
             stroke-width: 2;
             stroke-linecap: round;
@@ -103,8 +103,8 @@
         .stat-label { font-size: 0.7em; opacity: 0.9; text-transform: uppercase; letter-spacing: 0.5px; }
         
         .refresh-btn, .export-btn {
-            background: linear-gradient(135deg, #8dc73f, #6ba832);
-            color: #014711;
+            background: linear-gradient(135deg, #A78BFA, #8B5CF6);
+            color: #1e1b2e;
             border: none;
             padding: 11px 20px;
             border-radius: 12px;
@@ -114,25 +114,53 @@
             font-size: 0.85em;
             transition: all 0.3s;
             white-space: nowrap;
-            box-shadow: 0 4px 15px rgba(141, 199, 63, 0.4);
+            box-shadow: 0 4px 15px rgba(167, 139, 250, 0.4);
             display: inline-flex;
             align-items: center;
             gap: 6px;
         }
         
-        .refresh-btn svg, .export-btn svg {
+        .clear-btn {
+            background: linear-gradient(135deg, #e74c3c, #c0392b);
+            color: white;
+            border: none;
+            padding: 11px 20px;
+            border-radius: 12px;
+            font-weight: 700;
+            font-family: 'Montserrat', sans-serif;
+            cursor: pointer;
+            font-size: 0.85em;
+            transition: all 0.3s;
+            white-space: nowrap;
+            box-shadow: 0 4px 15px rgba(231, 76, 60, 0.4);
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+        }
+        
+        .clear-btn svg {
             width: 16px;
             height: 16px;
-            stroke: #014711;
+            stroke: white;
             fill: none;
             stroke-width: 2;
             stroke-linecap: round;
             stroke-linejoin: round;
         }
         
-        .refresh-btn:hover, .export-btn:hover {
+        .refresh-btn svg, .export-btn svg {
+            width: 16px;
+            height: 16px;
+            stroke: #1e1b2e;
+            fill: none;
+            stroke-width: 2;
+            stroke-linecap: round;
+            stroke-linejoin: round;
+        }
+        
+        .refresh-btn:hover, .export-btn:hover, .clear-btn:hover {
             transform: translateY(-3px);
-            box-shadow: 0 8px 25px rgba(141, 199, 63, 0.5);
+            box-shadow: 0 8px 25px rgba(0,0,0,0.2);
         }
         
         .ticket-card {
@@ -140,7 +168,7 @@
             border-radius: 16px;
             padding: 20px 24px;
             margin-bottom: 14px;
-            border-left: 6px solid #8dc73f;
+            border-left: 6px solid #A78BFA;
             box-shadow: var(--shadow-sm);
             transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
             animation: cardIn 0.5s ease-out;
@@ -171,7 +199,7 @@
         .ticket-id { 
             font-size: 1.2em; 
             font-weight: 700; 
-            color: #014711;
+            color: #6C3CE1;
             display: flex;
             align-items: center;
             gap: 6px;
@@ -180,7 +208,7 @@
         .ticket-id svg {
             width: 18px;
             height: 18px;
-            stroke: #014711;
+            stroke: #6C3CE1;
             fill: none;
             stroke-width: 2;
             stroke-linecap: round;
@@ -202,8 +230,8 @@
         .priority-critical { background: #ff0000; color: white; }
         
         .status-open {
-            background: #e8f5e9;
-            color: #2e7d32;
+            background: #ede9fe;
+            color: #6C3CE1;
             padding: 5px 14px;
             border-radius: 20px;
             font-size: 0.75em;
@@ -215,7 +243,7 @@
         }
         
         .status-resolved {
-            background: #1a5632;
+            background: #6C3CE1;
             color: #ffffff;
             padding: 5px 14px;
             border-radius: 20px;
@@ -230,12 +258,12 @@
         .ticket-issue { color: #555; line-height: 1.6; margin: 10px 0; font-size: 0.9em; }
         
         .ticket-user {
-            background: linear-gradient(135deg, #f8faf7, #f0f4f0);
+            background: linear-gradient(135deg, #f5f3ff, #ede9fe);
             padding: 10px 14px;
             border-radius: 10px;
             margin: 10px 0;
             font-size: 0.85em;
-            color: #333;
+            color: #1e1b2e;
             display: flex;
             align-items: center;
             gap: 12px;
@@ -245,7 +273,7 @@
         .ticket-user svg {
             width: 16px;
             height: 16px;
-            stroke: #014711;
+            stroke: #6C3CE1;
             fill: none;
             stroke-width: 2;
             stroke-linecap: round;
@@ -290,17 +318,17 @@
         }
         
         .resolve-btn {
-            background: linear-gradient(135deg, #8dc73f, #6ba832);
-            color: #014711;
-            box-shadow: 0 4px 12px rgba(141, 199, 63, 0.4);
+            background: linear-gradient(135deg, #A78BFA, #8B5CF6);
+            color: #1e1b2e;
+            box-shadow: 0 4px 12px rgba(167, 139, 250, 0.4);
         }
         
-        .resolve-btn svg { stroke: #014711; }
+        .resolve-btn svg { stroke: #1e1b2e; }
         
         .chat-btn {
-            background: linear-gradient(135deg, #014711, #023d18);
+            background: linear-gradient(135deg, #6C3CE1, #8B5CF6);
             color: white;
-            box-shadow: 0 4px 12px rgba(1, 71, 17, 0.3);
+            box-shadow: 0 4px 12px rgba(108, 60, 225, 0.3);
         }
         
         .chat-btn svg { stroke: white; }
@@ -311,7 +339,7 @@
         }
         
         .resolved-badge {
-            background: #1a5632;
+            background: #6C3CE1;
             color: #ffffff;
             padding: 8px 18px;
             border-radius: 25px;
@@ -340,7 +368,7 @@
             left: 0;
             width: 100%;
             height: 100%;
-            background: rgba(1, 71, 17, 0.85);
+            background: rgba(108, 60, 225, 0.85);
             backdrop-filter: blur(10px);
             z-index: 1000;
             justify-content: center;
@@ -366,7 +394,7 @@
         }
         
         .chat-modal-header {
-            background: linear-gradient(135deg, #014711, #023d18);
+            background: linear-gradient(135deg, #6C3CE1, #8B5CF6);
             color: white;
             padding: 18px 20px;
             display: flex;
@@ -378,21 +406,21 @@
             flex: 1;
             overflow-y: auto;
             padding: 18px;
-            background: linear-gradient(180deg, #f8faf7, #f0f4f0);
+            background: linear-gradient(180deg, #f5f3ff, #ede9fe);
         }
         
         .chat-modal-input {
             padding: 16px;
             display: flex;
             gap: 10px;
-            border-top: 1px solid #f0f4f0;
+            border-top: 1px solid #e0e0e0;
             background: white;
         }
         
         .chat-modal-input input {
             flex: 1;
             padding: 12px 16px;
-            border: 2px solid #e8f0e8;
+            border: 2px solid #e0e0e0;
             border-radius: 25px;
             outline: none;
             font-family: 'Montserrat', sans-serif;
@@ -400,13 +428,13 @@
         }
         
         .chat-modal-input input:focus {
-            border-color: #8dc73f;
-            box-shadow: 0 0 0 4px rgba(141, 199, 63, 0.1);
+            border-color: #A78BFA;
+            box-shadow: 0 0 0 4px rgba(167, 139, 250, 0.1);
         }
         
         .chat-modal-input button {
-            background: linear-gradient(135deg, #8dc73f, #6ba832);
-            color: #014711;
+            background: linear-gradient(135deg, #A78BFA, #8B5CF6);
+            color: #1e1b2e;
             border: none;
             padding: 12px 22px;
             border-radius: 25px;
@@ -414,7 +442,7 @@
             cursor: pointer;
             font-family: 'Montserrat', sans-serif;
             transition: all 0.3s;
-            box-shadow: 0 4px 12px rgba(141, 199, 63, 0.4);
+            box-shadow: 0 4px 12px rgba(167, 139, 250, 0.4);
             display: inline-flex;
             align-items: center;
             gap: 6px;
@@ -423,7 +451,7 @@
         .chat-modal-input button svg {
             width: 16px;
             height: 16px;
-            stroke: #014711;
+            stroke: #1e1b2e;
             fill: none;
             stroke-width: 2;
             stroke-linecap: round;
@@ -487,6 +515,10 @@
                     <svg viewBox="0 0 24 24"><path d="M12 20V10"/><path d="M18 20V4"/><path d="M6 20v-4"/></svg>
                     Bot Stats
                 </button>
+                <button class="clear-btn" onclick="clearAllTickets()">
+                    <svg viewBox="0 0 24 24"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/><line x1="10" y1="11" x2="10" y2="17"/><line x1="14" y1="11" x2="14" y2="17"/></svg>
+                    Clear Logs
+                </button>
                 <img src="/static/Agmas LinkedIn Carousel.png" alt="Company Logo" 
                      style="width:45px; height:45px; border-radius:12px; object-fit:contain; background:white; padding:4px; margin-left:8px; box-shadow:0 4px 12px rgba(0,0,0,0.2);"
                      onerror="this.style.display='none';">
@@ -505,8 +537,8 @@
                     <svg viewBox="0 0 24 24" style="width:18px;height:18px;stroke:white;fill:none;stroke-width:2;"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
                     Ticket Chat <span id="chatTicketId"></span>
                 </h3>
-                <div style="display:flex; align-items:center; gap:5px; font-size:0.7em; color:#8dc73f; margin-right:15px;">
-                    <span style="width:8px; height:8px; background:#8dc73f; border-radius:50%; animation:pulse 2s infinite; display:inline-block;"></span>
+                <div style="display:flex; align-items:center; gap:5px; font-size:0.7em; color:#A78BFA; margin-right:15px;">
+                    <span style="width:8px; height:8px; background:#A78BFA; border-radius:50%; animation:pulse 2s infinite; display:inline-block;"></span>
                     Live
                 </div>
                 <button onclick="closeChat()" style="background:none; border:none; color:white; font-size:1.5em; cursor:pointer;">
@@ -617,6 +649,30 @@
             window.open('/api/export-tickets', '_blank');
         }
         
+        async function clearAllTickets() {
+            if (!confirm('Are you sure you want to clear ALL tickets and chat logs? This cannot be undone.')) {
+                return;
+            }
+            
+            if (!confirm('Final warning: This will permanently delete ALL tickets, messages, and bot sessions.')) {
+                return;
+            }
+            
+            try {
+                const response = await fetch('/api/clear-tickets', { method: 'POST' });
+                const data = await response.json();
+                
+                if (response.ok) {
+                    alert('All logs cleared successfully!');
+                    loadTickets();
+                } else {
+                    alert('Error clearing logs: ' + (data.error || 'Unknown error'));
+                }
+            } catch (error) {
+                alert('Error: ' + error.message);
+            }
+        }
+        
         function openChat(ticketId) {
             currentTicketId = ticketId;
             document.getElementById('chatTicketId').textContent = '#' + ticketId;
@@ -658,8 +714,8 @@
                     return `
                         <div style="margin:10px 0; text-align:${isIT ? 'right' : 'left'};">
                             <div style="display:inline-block; padding:10px 15px; border-radius:15px; 
-                                        background:${isIT ? '#014711' : '#e8f5e9'}; 
-                                        color:${isIT ? 'white' : '#333'};
+                                        background:${isIT ? '#6C3CE1' : '#ede9fe'}; 
+                                        color:${isIT ? 'white' : '#1e1b2e'};
                                         max-width:80%;">
                                 <strong style="font-size:0.7em;">${msg.sender}</strong><br>
                                 ${content}

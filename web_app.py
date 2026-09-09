@@ -104,7 +104,7 @@ def chat():
         return jsonify(response)
     except Exception as e:
         print(f"Chat error: {e}")
-        return jsonify({'message': f'❌ Error processing message: {str(e)}', 'type': 'error'}), 500
+        return jsonify({'message': f'Error processing message: {str(e)}', 'type': 'error'}), 500
 
 # ============================================
 # IT SUPPORT TEAM - TICKET DASHBOARD
@@ -148,6 +148,35 @@ def resolve_ticket(ticket_id):
         return jsonify({'success': True})
     except Exception as e:
         print(f"Error resolving ticket: {e}")
+        return jsonify({'success': False, 'error': str(e)}), 500
+
+# ============================================
+# CLEAR LOGS ROUTE (NEW)
+# ============================================
+
+@app.route('/api/clear-tickets', methods=['POST'])
+def clear_tickets():
+    """Clear all tickets and messages from database"""
+    try:
+        db_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'data', 'it_support.db')
+        conn = sqlite3.connect(db_path)
+        cursor = conn.cursor()
+        
+        # Clear all messages
+        cursor.execute('DELETE FROM messages')
+        
+        # Clear all tickets
+        cursor.execute('DELETE FROM tickets')
+        
+        # Clear bot sessions
+        cursor.execute('DELETE FROM bot_sessions')
+        
+        conn.commit()
+        conn.close()
+        
+        return jsonify({'success': True, 'message': 'All tickets cleared'})
+    except Exception as e:
+        print(f"Error clearing tickets: {e}")
         return jsonify({'success': False, 'error': str(e)}), 500
 
 # ============================================
@@ -208,25 +237,21 @@ def upload_image():
         if not ticket_id or not image_data:
             return jsonify({'error': 'Missing data'}), 400
         
-        # Decode base64 image
         if ',' in image_data:
             image_bytes = base64.b64decode(image_data.split(',')[1])
         else:
             image_bytes = base64.b64decode(image_data)
         
-        # Create uploads folder if not exists
         uploads_dir = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'static', 'uploads')
         if not os.path.exists(uploads_dir):
             os.makedirs(uploads_dir)
         
-        # Save image
         image_filename = f"chat_{ticket_id}_{int(time.time())}.png"
         image_path = os.path.join(uploads_dir, image_filename)
         
         with open(image_path, 'wb') as f:
             f.write(image_bytes)
         
-        # Save message with image reference
         image_url = f"/static/uploads/{image_filename}"
         message_text = f"[Image] {image_url}"
         
@@ -246,7 +271,7 @@ def upload_image():
         return jsonify({'error': str(e)}), 500
 
 # ============================================
-# BOT SESSION TRACKING ROUTES (NEW)
+# BOT SESSION TRACKING ROUTES
 # ============================================
 
 @app.route('/api/track-session', methods=['POST'])
@@ -440,7 +465,7 @@ def test_email():
         sg = SendGridNotifier()
         
         if not sg.api_key:
-            return "❌ API Key is empty! Add SENDGRID_API_KEY to Render Environment."
+            return "API Key is empty! Add SENDGRID_API_KEY to Render Environment."
         
         result = sg.send_email(
             "agmasiltd@gmail.com",
@@ -449,11 +474,11 @@ def test_email():
         )
         
         if result:
-            return "✅ Email sent! Check agmasiltd@gmail.com"
+            return "Email sent! Check agmasiltd@gmail.com"
         else:
-            return "❌ Email failed. Check Render logs."
+            return "Email failed. Check Render logs."
     except Exception as e:
-        return f"❌ Error: {str(e)}"
+        return f"Error: {str(e)}"
 
 
 # ============================================
@@ -462,7 +487,7 @@ def test_email():
 
 if __name__ == '__main__':
     port = int(os.environ.get('PORT', 5000))
-    print("🚀 Starting IT Support Chatbot...")
-    print(f"👤 User Chat:     http://0.0.0.0:{port}")
-    print(f"📊 Admin Tickets: http://0.0.0.0:{port}/admin/tickets")
+    print("Starting IT Support Chatbot...")
+    print(f"User Chat:     http://0.0.0.0:{port}")
+    print(f"Admin Tickets: http://0.0.0.0:{port}/admin/tickets")
     app.run(debug=False, host='0.0.0.0', port=port)
