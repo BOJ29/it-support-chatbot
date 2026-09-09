@@ -7,11 +7,11 @@
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <style>
         :root {
-            --primary: #014711;
-            --secondary: #8dc73f;
+            --primary: #6C3CE1;
+            --secondary: #A78BFA;
             --white: #ffffff;
-            --light-bg: #f8faf7;
-            --dark-text: #1a2e1a;
+            --light-bg: #f5f3ff;
+            --dark-text: #1e1b2e;
             --gray-text: #666;
             --shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
             --shadow-sm: 0 4px 15px rgba(0,0,0,0.08);
@@ -21,7 +21,7 @@
 
         body {
             font-family: 'Montserrat', sans-serif;
-            background: linear-gradient(135deg, #f0f4f0 0%, #e8f0e8 50%, #f0f4f0 100%);
+            background: linear-gradient(135deg, #f5f3ff 0%, #ede9fe 50%, #f5f3ff 100%);
             min-height: 100vh;
             display: flex;
             justify-content: center;
@@ -44,12 +44,12 @@
         }
 
         .chat-header {
-            background: linear-gradient(135deg, #014711, #023d18);
+            background: linear-gradient(135deg, #6C3CE1, #8B5CF6);
             padding: 18px 24px;
             display: flex;
             align-items: center;
             justify-content: space-between;
-            border-bottom: 3px solid #8dc73f;
+            border-bottom: 3px solid #A78BFA;
             flex-shrink: 0;
             position: relative;
             overflow: hidden;
@@ -62,7 +62,7 @@
             right: -20%;
             width: 200px;
             height: 200px;
-            background: rgba(141, 199, 63, 0.1);
+            background: rgba(167, 139, 250, 0.2);
             border-radius: 50%;
         }
 
@@ -76,19 +76,19 @@
         .header-icon {
             width: 45px;
             height: 45px;
-            background: linear-gradient(135deg, #8dc73f, #6ba832);
+            background: linear-gradient(135deg, #A78BFA, #8B5CF6);
             border-radius: 14px;
             display: flex;
             align-items: center;
             justify-content: center;
             flex-shrink: 0;
-            box-shadow: 0 4px 12px rgba(141, 199, 63, 0.4);
+            box-shadow: 0 4px 12px rgba(167, 139, 250, 0.4);
         }
 
         .header-icon svg {
             width: 24px;
             height: 24px;
-            stroke: #014711;
+            stroke: #1e1b2e;
             fill: none;
             stroke-width: 2;
             stroke-linecap: round;
@@ -107,7 +107,7 @@
         .header-info span {
             font-size: 0.72em;
             font-weight: 500;
-            color: #8dc73f;
+            color: #A78BFA;
             letter-spacing: 0.5px;
             display: flex;
             align-items: center;
@@ -117,36 +117,16 @@
         .status-dot {
             width: 8px;
             height: 8px;
-            background: #8dc73f;
+            background: #A78BFA;
             border-radius: 50%;
             animation: pulse 2s infinite;
             display: inline-block;
-            box-shadow: 0 0 10px #8dc73f;
+            box-shadow: 0 0 10px #A78BFA;
         }
 
         @keyframes pulse {
             0%, 100% { opacity: 1; transform: scale(1); }
             50% { opacity: 0.4; transform: scale(1.5); }
-        }
-
-        .header-logo {
-            width: 48px;
-            height: 48px;
-            background: #ffffff;
-            border-radius: 14px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            flex-shrink: 0;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
-            z-index: 1;
-            overflow: hidden;
-        }
-
-        .header-logo img {
-            width: 36px;
-            height: 36px;
-            object-fit: contain;
         }
 
         .name-modal {
@@ -155,7 +135,7 @@
             left: 0;
             width: 100%;
             height: 100%;
-            background: rgba(1, 71, 17, 0.85);
+            background: rgba(108, 60, 225, 0.85);
             backdrop-filter: blur(10px);
             z-index: 1000;
             display: flex;
@@ -188,7 +168,7 @@
         .modal-icon {
             width: 60px;
             height: 60px;
-            background: linear-gradient(135deg, #8dc73f, #6ba832);
+            background: linear-gradient(135deg, #A78BFA, #8B5CF6);
             border-radius: 20px;
             display: flex;
             align-items: center;
@@ -199,7 +179,7 @@
         .modal-icon svg {
             width: 30px;
             height: 30px;
-            stroke: #014711;
+            stroke: #1e1b2e;
             fill: none;
             stroke-width: 2;
             stroke-linecap: round;
@@ -207,7 +187,7 @@
         }
 
         .name-modal-box h2 {
-            color: #014711;
+            color: #6C3CE1;
             margin-bottom: 10px;
             font-size: 1.4em;
             font-weight: 700;
@@ -229,18 +209,18 @@
             font-family: 'Montserrat', sans-serif;
             outline: none;
             transition: all 0.3s;
-            background: #f8faf7;
+            background: #f5f3ff;
         }
 
         .name-modal-box input:focus {
-            border-color: #8dc73f;
-            box-shadow: 0 0 0 4px rgba(141, 199, 63, 0.1);
+            border-color: #A78BFA;
+            box-shadow: 0 0 0 4px rgba(167, 139, 250, 0.1);
             background: white;
         }
 
         .name-modal-box button {
-            background: linear-gradient(135deg, #8dc73f, #6ba832);
-            color: #014711;
+            background: linear-gradient(135deg, #A78BFA, #8B5CF6);
+            color: #1e1b2e;
             padding: 14px 35px;
             border: none;
             border-radius: 30px;
@@ -249,7 +229,7 @@
             cursor: pointer;
             font-family: 'Montserrat', sans-serif;
             transition: all 0.3s;
-            box-shadow: 0 4px 15px rgba(141, 199, 63, 0.4);
+            box-shadow: 0 4px 15px rgba(167, 139, 250, 0.4);
             margin-top: 10px;
             display: inline-flex;
             align-items: center;
@@ -259,7 +239,7 @@
         .name-modal-box button svg {
             width: 18px;
             height: 18px;
-            stroke: #014711;
+            stroke: #1e1b2e;
             fill: none;
             stroke-width: 2;
             stroke-linecap: round;
@@ -268,13 +248,13 @@
 
         .name-modal-box button:hover {
             transform: translateY(-3px);
-            box-shadow: 0 8px 25px rgba(141, 199, 63, 0.5);
+            box-shadow: 0 8px 25px rgba(167, 139, 250, 0.5);
         }
 
         .quick-buttons {
             padding: 14px 20px;
             background: #ffffff;
-            border-bottom: 1px solid #f0f4f0;
+            border-bottom: 1px solid #f0f0f0;
             display: flex;
             gap: 8px;
             flex-wrap: wrap;
@@ -283,8 +263,8 @@
 
         .quick-btn {
             background: #ffffff;
-            color: #014711;
-            border: 1.5px solid #8dc73f;
+            color: #6C3CE1;
+            border: 1.5px solid #A78BFA;
             padding: 9px 16px;
             border-radius: 25px;
             cursor: pointer;
@@ -319,7 +299,7 @@
             left: 50%;
             width: 0;
             height: 0;
-            background: rgba(141, 199, 63, 0.2);
+            background: rgba(167, 139, 250, 0.2);
             border-radius: 50%;
             transform: translate(-50%, -50%);
             transition: all 0.5s;
@@ -331,17 +311,17 @@
         }
 
         .quick-btn:hover {
-            background: #8dc73f;
-            color: #014711;
+            background: #A78BFA;
+            color: #1e1b2e;
             transform: translateY(-3px);
-            box-shadow: 0 8px 20px rgba(141, 199, 63, 0.4);
+            box-shadow: 0 8px 20px rgba(167, 139, 250, 0.4);
         }
 
         .chat-messages {
             flex: 1;
             overflow-y: auto;
             padding: 20px 18px;
-            background: linear-gradient(180deg, #f8faf7 0%, #f0f4f0 100%);
+            background: linear-gradient(180deg, #f5f3ff 0%, #ede9fe 100%);
             -webkit-overflow-scrolling: touch;
         }
 
@@ -365,40 +345,40 @@
 
         .bot-message {
             background: #ffffff;
-            border: 1px solid #e8f0e8;
+            border: 1px solid #ede9fe;
             margin-right: auto;
             border-bottom-left-radius: 5px;
             box-shadow: 0 2px 10px rgba(0,0,0,0.04);
-            color: #1a2e1a;
+            color: #1e1b2e;
         }
 
         .user-message {
-            background: linear-gradient(135deg, #014711, #023d18);
+            background: linear-gradient(135deg, #6C3CE1, #8B5CF6);
             color: #ffffff;
             margin-left: auto;
             border-bottom-right-radius: 5px;
-            box-shadow: 0 4px 15px rgba(1, 71, 17, 0.3);
+            box-shadow: 0 4px 15px rgba(108, 60, 225, 0.3);
         }
 
         .ticket-badge {
             display: inline-flex;
             align-items: center;
             gap: 6px;
-            background: linear-gradient(135deg, #8dc73f, #6ba832);
-            color: #014711;
+            background: linear-gradient(135deg, #A78BFA, #8B5CF6);
+            color: #1e1b2e;
             padding: 6px 14px;
             border-radius: 20px;
             font-size: 0.78em;
             margin-top: 10px;
             font-weight: 700;
             letter-spacing: 0.3px;
-            box-shadow: 0 2px 8px rgba(141, 199, 63, 0.3);
+            box-shadow: 0 2px 8px rgba(167, 139, 250, 0.3);
         }
 
         .ticket-badge svg {
             width: 14px;
             height: 14px;
-            stroke: #014711;
+            stroke: #1e1b2e;
             fill: none;
             stroke-width: 2;
             stroke-linecap: round;
@@ -410,8 +390,8 @@
             align-items: center;
             gap: 8px;
             margin: 12px 0;
-            background: linear-gradient(135deg, #8dc73f, #6ba832);
-            color: #014711;
+            background: linear-gradient(135deg, #A78BFA, #8B5CF6);
+            color: #1e1b2e;
             border: none;
             padding: 14px 28px;
             border-radius: 30px;
@@ -420,13 +400,13 @@
             font-weight: 700;
             font-size: 0.9em;
             transition: all 0.3s;
-            box-shadow: 0 4px 15px rgba(141, 199, 63, 0.4);
+            box-shadow: 0 4px 15px rgba(167, 139, 250, 0.4);
         }
 
         .chat-link-btn svg {
             width: 18px;
             height: 18px;
-            stroke: #014711;
+            stroke: #1e1b2e;
             fill: none;
             stroke-width: 2;
             stroke-linecap: round;
@@ -435,13 +415,13 @@
 
         .chat-link-btn:hover {
             transform: translateY(-3px);
-            box-shadow: 0 8px 25px rgba(141, 199, 63, 0.5);
+            box-shadow: 0 8px 25px rgba(167, 139, 250, 0.5);
         }
 
         .chat-input-area {
             padding: 16px 20px;
             background: #ffffff;
-            border-top: 1px solid #f0f4f0;
+            border-top: 1px solid #f0f0f0;
             display: flex;
             gap: 10px;
             align-items: center;
@@ -451,27 +431,27 @@
         #messageInput {
             flex: 1;
             padding: 14px 18px;
-            border: 2px solid #e8f0e8;
+            border: 2px solid #ede9fe;
             border-radius: 30px;
             font-size: 0.9em;
             font-family: 'Montserrat', sans-serif;
             font-weight: 400;
             outline: none;
             transition: all 0.3s;
-            background: #f8faf7;
-            color: #1a2e1a;
+            background: #f5f3ff;
+            color: #1e1b2e;
             min-width: 0;
         }
 
         #messageInput:focus {
-            border-color: #8dc73f;
-            box-shadow: 0 0 0 4px rgba(141, 199, 63, 0.1);
+            border-color: #A78BFA;
+            box-shadow: 0 0 0 4px rgba(167, 139, 250, 0.1);
             background: #ffffff;
         }
 
         #sendButton {
-            background: linear-gradient(135deg, #8dc73f, #6ba832);
-            color: #014711;
+            background: linear-gradient(135deg, #A78BFA, #8B5CF6);
+            color: #1e1b2e;
             border: none;
             padding: 14px 28px;
             border-radius: 30px;
@@ -482,7 +462,7 @@
             letter-spacing: 0.3px;
             transition: all 0.3s;
             white-space: nowrap;
-            box-shadow: 0 4px 15px rgba(141, 199, 63, 0.4);
+            box-shadow: 0 4px 15px rgba(167, 139, 250, 0.4);
             display: inline-flex;
             align-items: center;
             gap: 8px;
@@ -491,7 +471,7 @@
         #sendButton svg {
             width: 18px;
             height: 18px;
-            stroke: #014711;
+            stroke: #1e1b2e;
             fill: none;
             stroke-width: 2;
             stroke-linecap: round;
@@ -500,7 +480,7 @@
 
         #sendButton:hover {
             transform: translateY(-3px);
-            box-shadow: 0 8px 25px rgba(141, 199, 63, 0.5);
+            box-shadow: 0 8px 25px rgba(167, 139, 250, 0.5);
         }
 
         .chat-modal {
@@ -510,7 +490,7 @@
             left: 0;
             width: 100%;
             height: 100%;
-            background: rgba(1, 71, 17, 0.85);
+            background: rgba(108, 60, 225, 0.85);
             backdrop-filter: blur(10px);
             z-index: 1000;
             justify-content: center;
@@ -531,7 +511,7 @@
         }
 
         .chat-modal-header {
-            background: linear-gradient(135deg, #014711, #023d18);
+            background: linear-gradient(135deg, #6C3CE1, #8B5CF6);
             color: white;
             padding: 18px 20px;
             display: flex;
@@ -543,21 +523,21 @@
             flex: 1;
             overflow-y: auto;
             padding: 18px;
-            background: linear-gradient(180deg, #f8faf7, #f0f4f0);
+            background: linear-gradient(180deg, #f5f3ff, #ede9fe);
         }
 
         .chat-modal-input {
             padding: 16px;
             display: flex;
             gap: 10px;
-            border-top: 1px solid #f0f4f0;
+            border-top: 1px solid #f0f0f0;
             background: white;
         }
 
         .chat-modal-input input[type="text"] {
             flex: 1;
             padding: 12px 16px;
-            border: 2px solid #e8f0e8;
+            border: 2px solid #ede9fe;
             border-radius: 25px;
             outline: none;
             font-family: 'Montserrat', sans-serif;
@@ -565,13 +545,13 @@
         }
 
         .chat-modal-input input[type="text"]:focus {
-            border-color: #8dc73f;
-            box-shadow: 0 0 0 4px rgba(141, 199, 63, 0.1);
+            border-color: #A78BFA;
+            box-shadow: 0 0 0 4px rgba(167, 139, 250, 0.1);
         }
 
         .chat-modal-input button {
-            background: linear-gradient(135deg, #8dc73f, #6ba832);
-            color: #014711;
+            background: linear-gradient(135deg, #A78BFA, #8B5CF6);
+            color: #1e1b2e;
             border: none;
             padding: 12px 22px;
             border-radius: 25px;
@@ -579,7 +559,7 @@
             cursor: pointer;
             font-family: 'Montserrat', sans-serif;
             transition: all 0.3s;
-            box-shadow: 0 4px 12px rgba(141, 199, 63, 0.4);
+            box-shadow: 0 4px 12px rgba(167, 139, 250, 0.4);
             display: inline-flex;
             align-items: center;
             gap: 6px;
@@ -588,7 +568,7 @@
         .chat-modal-input button svg {
             width: 16px;
             height: 16px;
-            stroke: #014711;
+            stroke: #1e1b2e;
             fill: none;
             stroke-width: 2;
             stroke-linecap: round;
@@ -600,7 +580,7 @@
         }
 
         .attach-btn {
-            background: #014711;
+            background: #6C3CE1;
             color: white;
             border: none;
             padding: 12px 16px;
@@ -624,7 +604,7 @@
         }
 
         .attach-btn:hover {
-            background: #023d18;
+            background: #8B5CF6;
             transform: scale(1.1);
         }
 
@@ -640,7 +620,7 @@
 
         .chat-messages::-webkit-scrollbar-thumb,
         .chat-modal-body::-webkit-scrollbar-thumb {
-            background: #8dc73f;
+            background: #A78BFA;
             border-radius: 3px;
         }
 
@@ -667,11 +647,6 @@
 
             .header-info h2 {
                 font-size: 1em;
-            }
-
-            .header-logo {
-                width: 40px;
-                height: 40px;
             }
 
             .quick-buttons {
@@ -740,9 +715,6 @@
                     <span><span class="status-dot"></span> Online & Ready</span>
                 </div>
             </div>
-            <div class="header-logo">
-               <img src="/static/Agmas LinkedIn Carousel.png" alt="Company Logo" onerror="this.style.display='none'; this.parentNode.innerHTML='<span class=\'logo-text\'>IT</span>';">
-            </div>
         </div>
 
         <!-- QUICK BUTTONS -->
@@ -801,8 +773,8 @@
                     <svg viewBox="0 0 24 24" style="width:18px;height:18px;stroke:white;fill:none;stroke-width:2;"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
                     Chat with IT Support
                 </h3>
-                <div style="display:flex; align-items:center; gap:5px; font-size:0.75em; color:#8dc73f; margin-right:15px;">
-                    <span style="width:8px; height:8px; background:#8dc73f; border-radius:50%; animation:pulse 2s infinite; display:inline-block;"></span>
+                <div style="display:flex; align-items:center; gap:5px; font-size:0.75em; color:#A78BFA; margin-right:15px;">
+                    <span style="width:8px; height:8px; background:#A78BFA; border-radius:50%; animation:pulse 2s infinite; display:inline-block;"></span>
                     Live
                 </div>
                 <button onclick="closeChat()" style="background:none; border:none; color:white; font-size:1.5em; cursor:pointer;">
@@ -954,7 +926,7 @@
             const messagesDiv = document.getElementById('chatMessages');
             const chatBtn = document.createElement('button');
             chatBtn.className = 'chat-link-btn';
-            chatBtn.innerHTML = '<svg viewBox="0 0 24 24" style="width:18px;height:18px;stroke:#014711;fill:none;stroke-width:2;"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg> Chat with IT Support';
+            chatBtn.innerHTML = '<svg viewBox="0 0 24 24" style="width:18px;height:18px;stroke:#1e1b2e;fill:none;stroke-width:2;"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg> Chat with IT Support';
             chatBtn.onclick = function() {
                 openChat(ticketId);
             };
@@ -1003,8 +975,8 @@
                     return `
                         <div style="margin:10px 0; text-align:${isIT ? 'left' : 'right'};">
                             <div style="display:inline-block; padding:10px 15px; border-radius:15px; 
-                                        background:${isIT ? '#014711' : '#8dc73f'}; 
-                                        color:${isIT ? 'white' : '#014711'};
+                                        background:${isIT ? '#6C3CE1' : '#A78BFA'}; 
+                                        color:${isIT ? 'white' : '#1e1b2e'};
                                         max-width:80%;">
                                 <strong style="font-size:0.7em;">${msg.sender}</strong><br>
                                 ${content}
@@ -1103,7 +1075,7 @@
             const typingDiv = document.createElement('div');
             const id = 'typing_' + Date.now();
             typingDiv.id = id;
-            typingDiv.style.cssText = 'color:#8dc73f;font-style:italic;padding:10px 14px;font-size:0.85em;font-family:Montserrat,sans-serif;';
+            typingDiv.style.cssText = 'color:#A78BFA;font-style:italic;padding:10px 14px;font-size:0.85em;font-family:Montserrat,sans-serif;';
             typingDiv.innerHTML = 'Thinking...';
             messagesDiv.appendChild(typingDiv);
             messagesDiv.scrollTop = messagesDiv.scrollHeight;
