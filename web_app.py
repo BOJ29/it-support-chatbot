@@ -475,7 +475,7 @@ def test_email():
         return f"Error: {str(e)}"
 
 # ============================================
-# AI TEST ROUTE - DETAILED DEBUG
+# AI TEST ROUTE - DETAILED DEBUG (UPDATED MODEL)
 # ============================================
 
 @app.route('/test-ai')
@@ -488,7 +488,6 @@ def test_ai():
         if not gemini.api_key:
             return "❌ GEMINI_API_KEY is missing in Render Environment"
         
-        # Try the API call
         try:
             import google.generativeai as genai
             genai.configure(api_key=gemini.api_key)
@@ -512,32 +511,23 @@ def test_ai():
             <h3>Testing Models:</h3>
             """
             
-            # Try gemini-2.5-flash
+            # Try gemini-3.6-flash (current model)
             try:
-                model = genai.GenerativeModel('gemini-2.5-flash')
+                model = genai.GenerativeModel('gemini-3.6-flash')
                 response = model.generate_content("Say hello in one sentence.")
-                result += f"<p>✅ <strong>gemini-2.5-flash works!</strong></p>"
+                result += f"<p>✅ <strong>gemini-3.6-flash works!</strong></p>"
                 result += f"<p>Response: {response.text}</p>"
             except Exception as e:
-                result += f"<p>❌ gemini-2.5-flash failed: <code>{str(e)}</code></p>"
+                result += f"<p>❌ gemini-3.6-flash failed: <code>{str(e)}</code></p>"
             
-            # Try gemini-1.5-flash
+            # Try gemini-flash-latest as fallback
             try:
-                model = genai.GenerativeModel('gemini-1.5-flash')
+                model = genai.GenerativeModel('gemini-flash-latest')
                 response = model.generate_content("Say hello in one sentence.")
-                result += f"<p>✅ <strong>gemini-1.5-flash works!</strong></p>"
+                result += f"<p>✅ <strong>gemini-flash-latest works!</strong></p>"
                 result += f"<p>Response: {response.text}</p>"
             except Exception as e:
-                result += f"<p>❌ gemini-1.5-flash failed: <code>{str(e)}</code></p>"
-            
-            # Try gemini-pro
-            try:
-                model = genai.GenerativeModel('gemini-pro')
-                response = model.generate_content("Say hello in one sentence.")
-                result += f"<p>✅ <strong>gemini-pro works!</strong></p>"
-                result += f"<p>Response: {response.text}</p>"
-            except Exception as e:
-                result += f"<p>❌ gemini-pro failed: <code>{str(e)}</code></p>"
+                result += f"<p>❌ gemini-flash-latest failed: <code>{str(e)}</code></p>"
             
             return result
             
