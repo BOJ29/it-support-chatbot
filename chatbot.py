@@ -3,6 +3,13 @@ from ai_engine import AIEngine
 import os
 import sqlite3
 
+try:
+    from gemini_integration import GeminiIntegration
+    HAS_AI = True
+except Exception as e:
+    HAS_AI = False
+    print(f"Gemini AI not available: {e}")
+
 # Try to import email notifier, but don't crash if it fails
 try:
     from sendgrid_notifier import SendGridNotifier
