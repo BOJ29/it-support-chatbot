@@ -475,12 +475,12 @@ def test_email():
         return f"Error: {str(e)}"
 
 # ============================================
-# AI TEST ROUTE (NEW)
+# AI TEST ROUTE - DETAILED DEBUG
 # ============================================
 
 @app.route('/test-ai')
 def test_ai():
-    """Test if Gemini AI is working"""
+    """Test if Gemini AI is working with detailed errors"""
     try:
         from gemini_integration import GeminiIntegration
         gemini = GeminiIntegration()
@@ -488,15 +488,66 @@ def test_ai():
         if not gemini.api_key:
             return "❌ GEMINI_API_KEY is missing in Render Environment"
         
-        response = gemini.get_ai_response("Say hello in one sentence.")
-        
-        if response:
-            return f"✅ Gemini AI is working!<br><br><strong>Response:</strong><br>{response}"
-        else:
-            return "❌ Gemini returned None. Check Render logs."
+        # Try the API call
+        try:
+            import google.generativeai as genai
+            genai.configure(api_key=gemini.api_key)
+            
+            available_models = []
+            try:
+                for m in genai.list_models():
+                    if 'generateContent' in m.supported_generation_methods:
+                        available_models.append(m.name)
+            except Exception as e:
+                available_models = [f"Could not list models: {str(e)}"]
+            
+            result = f"""
+            <h2>🔍 Gemini Debug Info</h2>
+            <p><strong>API Key (first 10 chars):</strong> {gemini.api_key[:10]}...</p>
+            <p><strong>Available Models:</strong></p>
+            <ul>
+                {''.join([f'<li>{m}</li>' for m in available_models[:10]])}
+            </ul>
+            <hr>
+            <h3>Testing Models:</h3>
+            """
+            
+            # Try gemini-2.5-flash
+            try:
+                model = genai.GenerativeModel('gemini-2.5-flash')
+                response = model.generate_content("Say hello in one sentence.")
+                result += f"<p>✅ <strong>gemini-2.5-flash works!</strong></p>"
+                result += f"<p>Response: {response.text}</p>"
+            except Exception as e:
+                result += f"<p>❌ gemini-2.5-flash failed: <code>{str(e)}</code></p>"
+            
+            # Try gemini-1.5-flash
+            try:
+                model = genai.GenerativeModel('gemini-1.5-flash')
+                response = model.generate_content("Say hello in one sentence.")
+                result += f"<p>✅ <strong>gemini-1.5-flash works!</strong></p>"
+                result += f"<p>Response: {response.text}</p>"
+            except Exception as e:
+                result += f"<p>❌ gemini-1.5-flash failed: <code>{str(e)}</code></p>"
+            
+            # Try gemini-pro
+            try:
+                model = genai.GenerativeModel('gemini-pro')
+                response = model.generate_content("Say hello in one sentence.")
+                result += f"<p>✅ <strong>gemini-pro works!</strong></p>"
+                result += f"<p>Response: {response.text}</p>"
+            except Exception as e:
+                result += f"<p>❌ gemini-pro failed: <code>{str(e)}</code></p>"
+            
+            return result
+            
+        except Exception as e:
+            import traceback
+            return f"<h2>❌ Error</h2><pre>{traceback.format_exc()}</pre>"
+            
     except Exception as e:
         import traceback
-        return f"❌ Error: {str(e)}<br><br><pre>{traceback.format_exc()}</pre>"
+        return f"<h2>❌ Import Error</h2><pre>{traceback.format_exc()}</pre>"
 
 # ============================================
 # START THE SERVER
