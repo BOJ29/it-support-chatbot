@@ -62,7 +62,7 @@ class ITSupportChatbot:
         if session.get('awaiting_reply') and session.get('ticket_id'):
             return self._send_reply_to_it(user_id, message, session)
         
-        # 3. Check escalation (this must happen BEFORE AI)
+        # 3. Check escalation (strict phrases only)
         if self._should_escalate(message_lower):
             return self._escalate_issue(user_id, session)
         
@@ -74,7 +74,7 @@ class ITSupportChatbot:
         if message_lower in ['hi', 'hello', 'hey', 'yo', 'help']:
             return self._handle_greeting()
         
-        # 6. ✅ TRY AI FIRST for all other messages
+        # 6. Try AI FIRST for all other messages
         if HAS_AI and hasattr(self, 'gemini'):
             try:
                 print(f"🤖 Sending to Gemini AI: {message}")
@@ -293,7 +293,7 @@ class ITSupportChatbot:
                     email_thread = threading.Thread(
                         target=self.email.send_email,
                         args=(
-                            "agmasiltd@gmail.com",
+                            os.environ.get('IT_EMAIL', 'it-support@yourcompany.com'),
                             f"Ticket #{ticket_id} - {priority} Priority",
                             f"Ticket ID: #{ticket_id}\nPriority: {priority}\n"
                             f"Issue: {last_issue}\nStaff: {staff_name}\nEmail: {staff_email}"

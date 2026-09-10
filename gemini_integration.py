@@ -16,12 +16,13 @@ class GeminiIntegration:
             print("❌ No API key available")
             return None
         try:
-            prompt = f"""You are an IT support assistant for Agmas Ltd, a commodity export company.
+            prompt = f"""You are an IT support assistant helping staff with IT issues.
 Help the staff member with their IT issue.
 
 Staff issue: {user_message}
 
-Provide a helpful, numbered, step-by-step solution. Be concise but thorough."""
+Provide a helpful, numbered, step-by-step solution. Be concise but thorough.
+Do not mention any company names."""
             
             print(f"🤖 Calling Gemini: {user_message[:50]}...")
             response = self.model.generate_content(prompt)
