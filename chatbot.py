@@ -54,38 +54,38 @@ class ITSupportChatbot:
         session = self.user_sessions[user_id]
         message_lower = message.lower().strip()
         
-        # Check if user wants to see IT support messages
+        # 1. Check if user wants to see IT support messages
         if 'check messages' in message_lower or 'it support said' in message_lower or 'any update' in message_lower:
             return self._check_support_messages(user_id, session)
         
-        # Check if user is replying to IT support
+        # 2. Check if user is replying to IT support
         if session.get('awaiting_reply') and session.get('ticket_id'):
             return self._send_reply_to_it(user_id, message, session)
         
-        # Check escalation FIRST (before AI)
+        # 3. Check escalation (this must happen BEFORE AI)
         if self._should_escalate(message_lower):
             return self._escalate_issue(user_id, session)
         
-        # Check feedback (if awaiting response to "did this help?")
+        # 4. Check feedback (if awaiting "did this help?")
         if session.get('awaiting_feedback'):
             return self._handle_feedback(user_id, message_lower, session)
         
-        # Short greetings only
-        if message_lower in ['hi', 'hello', 'hey', 'yo']:
+        # 5. Short greetings only
+        if message_lower in ['hi', 'hello', 'hey', 'yo', 'help']:
             return self._handle_greeting()
         
-        # Try Claude/Gemini AI for everything else
+        # 6. ✅ TRY AI FIRST for all other messages
         if HAS_AI and hasattr(self, 'gemini'):
             try:
                 print(f"🤖 Sending to Gemini AI: {message}")
                 ai_response = self.gemini.get_ai_response(message)
-                print(f"🤖 Gemini response: {ai_response[:100] if ai_response else 'None'}...")
+                print(f"🤖 Gemini returned: {ai_response[:100] if ai_response else 'None'}")
                 
-                if ai_response and len(ai_response) > 30:
+                if ai_response and len(ai_response) > 20:
                     session['awaiting_feedback'] = True
                     session['last_issue'] = message
                     
-                    response_text = ai_response + "\n\n---\nDid this solve your problem?\n• Type 'yes' if it worked\n• Type 'escalate' if you need IT support"
+                    response_text = ai_response + "\n\n---\nDid this solve your problem?\nType 'yes' if it worked\nType 'escalate' if you need IT support"
                     
                     return {
                         'message': response_text,
@@ -94,9 +94,9 @@ class ITSupportChatbot:
                         'source': 'gemini'
                     }
             except Exception as e:
-                print(f"Gemini error: {e}")
+                print(f"Gemini exception in chatbot: {e}")
         
-        # Fallback to keyword search
+        # 7. Fallback to keyword search
         category = self._detect_category(message_lower)
         if category:
             session['category'] = category
@@ -212,10 +212,9 @@ class ITSupportChatbot:
             session['awaiting_feedback'] = False
             return self._escalate_issue(user_id, session)
         else:
-            return {
-                'message': "I didn't quite catch that. Did the solution work?\n\nType 'yes' if it worked\nType 'escalate' if you still need help",
-                'type': 'clarification'
-            }
+            # If not clear, treat as new question and send to AI
+            session['awaiting_feedback'] = False
+            return self.process_message(user_id, message, session.get('staff_name', ''), session.get('staff_email', ''))
     
     def _handle_greeting(self):
         response = (
@@ -242,8 +241,8 @@ class ITSupportChatbot:
         return None
     
     def _should_escalate(self, text):
-        escalation_phrases = ['escalate', 'not helping', 'still not working', 'didn\'t work',
-                              'talk to human', 'real person', 'it team', 'urgent', 'critical']
+        # Only escalate on explicit escalation phrases
+        escalation_phrases = ['escalate', 'talk to human', 'real person', 'it team please']
         return any(phrase in text for phrase in escalation_phrases)
     
     def _format_kb_response(self, solution):
