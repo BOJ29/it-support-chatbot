@@ -53,7 +53,6 @@ def init_db():
         )
     ''')
     
-    # NEW: bot_sessions table for tracking non-escalated chats
     cursor.execute('''
         CREATE TABLE IF NOT EXISTS bot_sessions (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -151,7 +150,7 @@ def resolve_ticket(ticket_id):
         return jsonify({'success': False, 'error': str(e)}), 500
 
 # ============================================
-# CLEAR LOGS ROUTE (NEW)
+# CLEAR LOGS ROUTE
 # ============================================
 
 @app.route('/api/clear-tickets', methods=['POST'])
@@ -162,13 +161,8 @@ def clear_tickets():
         conn = sqlite3.connect(db_path)
         cursor = conn.cursor()
         
-        # Clear all messages
         cursor.execute('DELETE FROM messages')
-        
-        # Clear all tickets
         cursor.execute('DELETE FROM tickets')
-        
-        # Clear bot sessions
         cursor.execute('DELETE FROM bot_sessions')
         
         conn.commit()
@@ -480,6 +474,29 @@ def test_email():
     except Exception as e:
         return f"Error: {str(e)}"
 
+# ============================================
+# AI TEST ROUTE (NEW)
+# ============================================
+
+@app.route('/test-ai')
+def test_ai():
+    """Test if Gemini AI is working"""
+    try:
+        from gemini_integration import GeminiIntegration
+        gemini = GeminiIntegration()
+        
+        if not gemini.api_key:
+            return "❌ GEMINI_API_KEY is missing in Render Environment"
+        
+        response = gemini.get_ai_response("Say hello in one sentence.")
+        
+        if response:
+            return f"✅ Gemini AI is working!<br><br><strong>Response:</strong><br>{response}"
+        else:
+            return "❌ Gemini returned None. Check Render logs."
+    except Exception as e:
+        import traceback
+        return f"❌ Error: {str(e)}<br><br><pre>{traceback.format_exc()}</pre>"
 
 # ============================================
 # START THE SERVER
