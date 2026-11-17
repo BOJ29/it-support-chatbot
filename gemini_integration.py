@@ -1,15 +1,26 @@
 from google import genai
+from google.genai import types
 import os
 
 class GeminiIntegration:
     def __init__(self):
         self.api_key = os.environ.get('GEMINI_API_KEY', '')
         if self.api_key:
-            # New SDK: create a client, no more genai.configure()
-            self.client = genai.Client(api_key=self.api_key)
-            # 'gemini-3.6-flash' is a valid stable model name[citation:1][citation:2]
-            self.model_name = 'gemini-3.6-flash'
-            print(f"✅ Gemini initialized with {self.model_name}")
+            # Create client with automatic retry for overloaded/temporary errors
+            self.client = genai.Client(
+                api_key=self.api_key,
+                http_options=types.HttpOptions(
+                    retry_options=types.HttpRetryOptions(
+                        initial_delay=2.0,          # Wait 2s before first retry
+                        attempts=6,                 # Max 6 retries
+                        exp_base=2,                 # Exponential backoff: 2s, 4s, 8s...
+                        max_delay=60,               # Cap each wait at 60s
+                        http_status_codes=[429, 500, 502, 503, 504]
+                    )
+                )
+            )
+            self.model_name = 'gemini-2.0-flash'
+            print(f"✅ Gemini initialized with {self.model_name} (retry enabled)")
         else:
             print("❌ GEMINI_API_KEY not set")
             self.client = None
@@ -28,7 +39,6 @@ Provide a helpful, numbered, step-by-step solution. Be concise but thorough.
 Do not mention any company names."""
             
             print(f"🤖 Calling Gemini: {user_message[:50]}...")
-            # New SDK call syntax
             response = self.client.models.generate_content(
                 model=self.model_name,
                 contents=prompt
@@ -37,6 +47,4 @@ Do not mention any company names."""
             return response.text
         except Exception as e:
             print(f"❌ Gemini error: {type(e).__name__}: {e}")
-            import traceback
-            traceback.print_exc()
             return None
