@@ -19,7 +19,7 @@ class GeminiIntegration:
                     )
                 )
             )
-            self.model_name = 'gemini-2.0-flash'
+            self.model_name = 'gemini-3.8-flash'
             print(f"✅ Gemini initialized with {self.model_name} (retry enabled)")
         else:
             print("❌ GEMINI_API_KEY not set")
