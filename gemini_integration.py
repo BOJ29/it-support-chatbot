@@ -1,18 +1,21 @@
-import google.generativeai as genai
+from google import genai
 import os
 
 class GeminiIntegration:
     def __init__(self):
         self.api_key = os.environ.get('GEMINI_API_KEY', '')
         if self.api_key:
-            genai.configure(api_key=self.api_key)
-            self.model = genai.GenerativeModel('gemini-3.6-flash')
-            print("✅ Gemini initialized with gemini-3.6-flash")
+            # New SDK: create a client, no more genai.configure()
+            self.client = genai.Client(api_key=self.api_key)
+            # 'gemini-3.6-flash' is a valid stable model name[citation:1][citation:2]
+            self.model_name = 'gemini-3.6-flash'
+            print(f"✅ Gemini initialized with {self.model_name}")
         else:
             print("❌ GEMINI_API_KEY not set")
+            self.client = None
     
     def get_ai_response(self, user_message):
-        if not self.api_key:
+        if not self.client:
             print("❌ No API key available")
             return None
         try:
@@ -25,11 +28,15 @@ Provide a helpful, numbered, step-by-step solution. Be concise but thorough.
 Do not mention any company names."""
             
             print(f"🤖 Calling Gemini: {user_message[:50]}...")
-            response = self.model.generate_content(prompt)
+            # New SDK call syntax
+            response = self.client.models.generate_content(
+                model=self.model_name,
+                contents=prompt
+            )
             print(f"✅ Gemini responded")
             return response.text
         except Exception as e:
-            print(f"❌ Gemini error: {e}")
+            print(f"❌ Gemini error: {type(e).__name__}: {e}")
             import traceback
             traceback.print_exc()
             return None

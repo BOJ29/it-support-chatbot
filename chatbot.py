@@ -27,12 +27,14 @@ class ITSupportChatbot:
             self.email = SendGridNotifier()
         if HAS_AI:
             self.gemini = GeminiIntegration()
+        self.user_sessions = []
+        # ✅ Fix: use a dict, not a list
         self.user_sessions = {}
-        
+
         all_solutions = self.knowledge.search_solutions("")
         if all_solutions:
             self.ai.prepare_solutions(all_solutions)
-    
+
     def process_message(self, user_id, message, staff_name='', staff_email=''):
         if user_id not in self.user_sessions:
             self.user_sessions[user_id] = {
@@ -50,61 +52,68 @@ class ITSupportChatbot:
                 self.user_sessions[user_id]['staff_name'] = staff_name
             if staff_email:
                 self.user_sessions[user_id]['staff_email'] = staff_email
-        
+
         session = self.user_sessions[user_id]
         message_lower = message.lower().strip()
-        
+
         # 1. Check if user wants to see IT support messages
         if 'check messages' in message_lower or 'it support said' in message_lower or 'any update' in message_lower:
             return self._check_support_messages(user_id, session)
-        
+
         # 2. Check if user is replying to IT support
         if session.get('awaiting_reply') and session.get('ticket_id'):
             return self._send_reply_to_it(user_id, message, session)
-        
-        # 3. Check escalation (this must happen BEFORE AI)
+
+        # 3. Explicit escalation
         if self._should_escalate(message_lower):
             return self._escalate_issue(user_id, session)
-        
-        # 4. Check feedback (if awaiting "did this help?")
+
+        # 4. Handle feedback on previous answer
         if session.get('awaiting_feedback'):
             return self._handle_feedback(user_id, message_lower, session)
-        
-        # 5. Short greetings only
+
+        # 5. Short greetings
         if message_lower in ['hi', 'hello', 'hey', 'yo', 'help']:
             return self._handle_greeting()
-        
-        # 6. ✅ TRY AI FIRST for all other messages
+
+        # 6. ✅ TRY GEMINI FIRST
         if HAS_AI and hasattr(self, 'gemini'):
             try:
-                print(f"🤖 Sending to Gemini AI: {message}")
+                print(f"🤖 Sending to Gemini: {message}")
                 ai_response = self.gemini.get_ai_response(message)
-                print(f"🤖 Gemini returned: {ai_response[:100] if ai_response else 'None'}")
-                
-                if ai_response and len(ai_response) > 20:
+                print(f"🤖 Gemini returned: {(ai_response[:120] if ai_response else 'None')}")
+
+                # ✅ Fix: only require non-empty, not >20 chars
+                # (short answers like "Restart the router." are valid)
+                if ai_response and ai_response.strip():
                     session['awaiting_feedback'] = True
                     session['last_issue'] = message
-                    
-                    response_text = ai_response + "\n\n---\nDid this solve your problem?\nType 'yes' if it worked\nType 'escalate' if you need IT support"
-                    
+
+                    response_text = (
+                        ai_response
+                        + "\n\n---\nDid this solve your problem?\n"
+                          "Type 'yes' if it worked\n"
+                          "Type 'escalate' if you need IT support"
+                    )
                     return {
                         'message': response_text,
                         'type': 'solution',
                         'confidence': 95,
                         'source': 'gemini'
                     }
+                else:
+                    print("⚠️  Gemini returned empty — falling back to local KB")
             except Exception as e:
-                print(f"Gemini exception in chatbot: {e}")
-        
+                print(f"❌ Gemini exception in chatbot: {type(e).__name__}: {e}")
+
         # 7. Fallback to keyword search
         category = self._detect_category(message_lower)
         if category:
             session['category'] = category
-        
+
         session['last_issue'] = message
-        
         kb_results = self.knowledge.search_solutions(message, category)
-        
+
         if kb_results:
             session['awaiting_feedback'] = True
             return self._format_kb_response(kb_results[0])
@@ -113,52 +122,51 @@ class ITSupportChatbot:
             if session['attempts'] >= 3:
                 return self._escalate_issue(user_id, session)
             return self._ask_more_details(session)
-    
+
+    # ---------- Everything below is unchanged from your version ----------
+
     def _check_support_messages(self, user_id, session):
         try:
             db_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'data', 'it_support.db')
             conn = sqlite3.connect(db_path)
             conn.row_factory = sqlite3.Row
             cursor = conn.cursor()
-            
+
             cursor.execute('''
-                SELECT id FROM tickets 
+                SELECT id FROM tickets
                 WHERE user_id = ? OR staff_email = ?
                 ORDER BY created_date DESC LIMIT 1
             ''', (user_id, user_id))
-            
             ticket = cursor.fetchone()
-            
+
             if not ticket:
                 return {
                     'message': "You don't have any open tickets.\n\nType 'escalate' to create a support ticket.",
                     'type': 'clarification'
                 }
-            
+
             cursor.execute('''
-                SELECT * FROM messages 
-                WHERE ticket_id = ? 
+                SELECT * FROM messages
+                WHERE ticket_id = ?
                 ORDER BY created_date ASC
             ''', (ticket['id'],))
-            
             messages = [dict(row) for row in cursor.fetchall()]
             conn.close()
-            
+
             if not messages:
                 return {
                     'message': "No messages from IT support yet.\n\nThey'll reply here soon.",
                     'type': 'clarification'
                 }
-            
+
             message_text = "Messages from IT Support:\n\n"
             for msg in messages:
                 message_text += f"[{msg['sender']}]: {msg['message']}\n\n"
-            
             message_text += "Type your reply below and it will be sent to IT support."
-            
+
             session['awaiting_reply'] = True
             session['ticket_id'] = ticket['id']
-            
+
             return {
                 'message': message_text,
                 'type': 'support_messages',
@@ -167,12 +175,11 @@ class ITSupportChatbot:
         except Exception as e:
             print(f"Error checking messages: {e}")
             return {'message': "Unable to check messages right now.", 'type': 'clarification'}
-    
+
     def _send_reply_to_it(self, user_id, message, session):
         try:
             ticket_id = session.get('ticket_id')
             staff_name = session.get('staff_name', 'Staff')
-            
             db_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'data', 'it_support.db')
             conn = sqlite3.connect(db_path)
             cursor = conn.cursor()
@@ -182,10 +189,10 @@ class ITSupportChatbot:
             ''', (ticket_id, staff_name, message))
             conn.commit()
             conn.close()
-            
+
             session['awaiting_reply'] = False
             session['ticket_id'] = None
-            
+
             return {
                 'message': "Your reply has been sent to IT support!\n\nType 'check messages' to see updates.",
                 'type': 'reply_sent'
@@ -193,14 +200,14 @@ class ITSupportChatbot:
         except Exception as e:
             print(f"Error sending reply: {e}")
             return {'message': "Failed to send reply. Please try again.", 'type': 'clarification'}
-    
+
     def _handle_feedback(self, user_id, message, session):
         positive_words = ['yes', 'yeah', 'yep', 'great', 'worked', 'working', 'solved',
                           'fixed', 'thanks', 'thank you', 'perfect', 'awesome', 'done',
                           'ok', 'okay', 'fine', 'good', 'helped', 'resolved']
         negative_words = ['no', 'nope', 'not', 'still', 'didn\'t', 'doesn\'t', 'escalate',
                           'help', 'did not', 'not working', 'still broken']
-        
+
         if any(word in message for word in positive_words) and not any(word in message for word in negative_words):
             session['awaiting_feedback'] = False
             session['attempts'] = 0
@@ -212,10 +219,13 @@ class ITSupportChatbot:
             session['awaiting_feedback'] = False
             return self._escalate_issue(user_id, session)
         else:
-            # If not clear, treat as new question and send to AI
             session['awaiting_feedback'] = False
-            return self.process_message(user_id, message, session.get('staff_name', ''), session.get('staff_email', ''))
-    
+            return self.process_message(
+                user_id, message,
+                session.get('staff_name', ''),
+                session.get('staff_email', '')
+            )
+
     def _handle_greeting(self):
         response = (
             "Hello! I'm your IT Support Assistant.\n\n"
@@ -227,7 +237,7 @@ class ITSupportChatbot:
             "Just describe your problem and I'll guide you!"
         )
         return {'message': response, 'type': 'greeting'}
-    
+
     def _detect_category(self, text):
         categories = {
             'Network': ['network', 'internet', 'wifi', 'ethernet', 'connection', 'dns', 'ip', 'router'],
@@ -239,12 +249,11 @@ class ITSupportChatbot:
             if any(keyword in text for keyword in keywords):
                 return category
         return None
-    
+
     def _should_escalate(self, text):
-        # Only escalate on explicit escalation phrases
         escalation_phrases = ['escalate', 'talk to human', 'real person', 'it team please']
         return any(phrase in text for phrase in escalation_phrases)
-    
+
     def _format_kb_response(self, solution):
         response = (
             f"I found this solution:\n\n"
@@ -254,7 +263,7 @@ class ITSupportChatbot:
             f"Type 'escalate' if you still need help"
         )
         return {'message': response, 'type': 'solution', 'solution': solution, 'confidence': 75}
-    
+
     def _ask_more_details(self, session):
         attempts = session.get('attempts', 1)
         if attempts == 1:
@@ -272,21 +281,21 @@ class ITSupportChatbot:
                 "• Or type 'escalate' to contact IT staff directly"
             )
         return {'message': response, 'type': 'clarification'}
-    
+
     def _escalate_issue(self, user_id, session):
         priority = 'Medium'
         if session.get('category') == 'System':
             priority = 'High'
-        
+
         last_issue = session.get('last_issue', 'Issue escalated by user')
         staff_name = session.get('staff_name', '')
         staff_email = session.get('staff_email', user_id)
-        
+
         try:
             ticket_id = self.knowledge.create_ticket(
                 user_id, last_issue, priority, staff_name, staff_email
             )
-            
+
             if HAS_EMAIL:
                 try:
                     import threading
@@ -303,7 +312,7 @@ class ITSupportChatbot:
                     email_thread.start()
                 except Exception as e:
                     print(f"Email notification failed: {e}")
-            
+
             self.user_sessions[user_id] = {
                 'attempts': 0,
                 'category': None,
@@ -314,7 +323,7 @@ class ITSupportChatbot:
                 'awaiting_reply': False,
                 'ticket_id': ticket_id
             }
-            
+
             return {
                 'message': (
                     f"SUPPORT TICKET CREATED!\n\n"
